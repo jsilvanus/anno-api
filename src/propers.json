@@ -1,0 +1,414 @@
+{
+  "source": "Jumalanpalvelusten kirja (Kirkkokäsikirja I, 2000)",
+  "prefaatiot": [
+    {
+      "title": "Prefaation päätös adventtiaikana",
+      "period": "adventtiaikana",
+      "appliesTo": [
+        "adventtiaika"
+      ],
+      "text": "Hänet sinä olet lähettänyt kansasi keskelle,\n\nhänessä ovat täyttyneet profeettojen ennustukset.\n\nKerran hän ilmestyy kunniassaan tuomitsemaan elävät ja kuolleet.\n\nMe kiitämme sinua tästä taivaan lahjasta\n\nja laulamme sinulle ylistystä enkelien ja kaikkien pyhien kanssa:"
+    },
+    {
+      "title": "Prefaation päätös jouluna",
+      "period": "jouluna",
+      "appliesTo": [
+        "jouluaatto",
+        "jouluyo",
+        "joulupaiva"
+      ],
+      "text": "Hänen syntymällään sinä valaisit maailman,\n\nkarkotit kuoleman varjon\n\nja lahjoitit meille ikuisen elämän toivon.\n\nMe kiitämme sinua tästä taivaan lahjasta\n\nja laulamme sinulle ylistystä enkelien ja kaikkien pyhien kanssa:"
+    },
+    {
+      "title": "Prefaation päätös jouluaikana",
+      "period": "jouluaikana",
+      "appliesTo": [
+        "jouluaika",
+        "kynttilanpaiva",
+        "marian-ilmestyspaiva"
+      ],
+      "text": "sekä kynttilänpäivänä ja Marian ilmestyspäivänä\n\nSinä olet antanut ainoan Poikasi tulla maailmaan ja syntyä ihmiseksi,\n\nettä meistä tulisi sinun lapsiasi ja pääsisimme pimeydestä valoon.\n\nMe kiitämme sinua tästä taivaan lahjasta\n\nja laulamme sinulle ylistystä enkelien ja kaikkien pyhien kanssa:"
+    },
+    {
+      "title": "Prefaation päätös loppiaisena",
+      "period": "loppiaisena",
+      "appliesTo": [
+        "loppiainen"
+      ],
+      "text": "Hänen kirkkautensa loistaa keskellämme\n\nja näyttää meille tien pimeydestä valoon.\n\nMe kiitämme sinua tästä taivaan lahjasta\n\nja laulamme sinulle ylistystä enkelien ja kaikkien pyhien kanssa:"
+    },
+    {
+      "title": "Prefaation päätös loppiaisaikana",
+      "period": "loppiaisaikana",
+      "appliesTo": [
+        "loppiaisaika",
+        "paastonaikaa-edeltavat"
+      ],
+      "text": "ja paastonaikaa edeltävinä sunnuntaina\n\nHän eli keskellämme kuuliaisena tahdollesi,\n\nja hänen teoissaan tuli ilmi sinun kirkkautesi.\n\nMe kiitämme sinua tästä taivaan lahjasta\n\nja laulamme sinulle ylistystä enkelien ja kaikkien pyhien kanssa:"
+    },
+    {
+      "title": "Prefaation päätös paastonaikana",
+      "period": "paastonaikana",
+      "appliesTo": [
+        "paastonaika"
+      ],
+      "text": "Sinä et ole jättänyt meitä synnin ja kuoleman valtaan,\n\nvaan olet antanut Poikasi kuolla meidän tähtemme,\n\nettä me kuolisimme pois synnistä ja eläisimme sinulle.\n\nMe kiitämme sinua tästä taivaan lahjasta\n\nja laulamme sinulle ylistystä enkelien ja kaikkien pyhien kanssa:"
+    },
+    {
+      "title": "Prefaation päätös kärsimysaikana",
+      "period": "kärsimysaikana",
+      "appliesTo": [
+        "karsimysaika"
+      ],
+      "text": "5. paastonajan sunnuntaista lähtien.\n\nHän oli kuuliainen kuolemaan asti.\n\nHän kesti loppuun saakka kiusaukset ja kärsimykset\n\npelastaakseen meidät pahan vallasta.\n\nMe kiitämme sinua tästä taivaan lahjasta\n\nja laulamme sinulle ylistystä enkelien ja kaikkien pyhien kanssa:"
+    },
+    {
+      "title": "Prefaation päätös pääsiäisyönä ja pääsiäispäivänä",
+      "period": "pääsiäisyönä ja pääsiäispäivänä",
+      "appliesTo": [
+        "paasiaisyo",
+        "paasiaispaiva"
+      ],
+      "text": "Hän on meidän pääsiäislampaamme,\n\njoka on uhrattu puolestamme.\n\nKuolemalla hän kukisti kuoleman\n\nja ylösnousemisellaan avasi meille tien ikuiseen elämään.\n\nSen tähden kaikki maa riemuitsee tänä yönä/päivänä\n\nja viettää juhlaa pääsiäisestä iloiten.\n\nMe kiitämme sinua tästä taivaan lahjasta\n\nja laulamme sinulle ylistystä enkelien ja kaikkien pyhien kanssa:"
+    },
+    {
+      "title": "Prefaation päätös pääsiäisaikana",
+      "period": "pääsiäisaikana",
+      "appliesTo": [
+        "paasiaisaika"
+      ],
+      "text": "Kuolemalla hän on voittanut kuoleman\n\nja riemullisella ylösnousemisellaan avannut meille tien ikuiseen\nelämään.\n\nHän antoi sydämeemme uuden virren,\n\nkiitoslaulun Jumalallemme.\n\nMe kiitämme sinua tästä taivaan lahjasta\n\nja laulamme sinulle ylistystä enkelien ja kaikkien pyhien kanssa:"
+    },
+    {
+      "title": "Prefaation päätös helatorstaista helluntaiaattoon",
+      "period": "helatorstaista helluntaiaattoon",
+      "appliesTo": [
+        "helatorstai-helluntaiaatto"
+      ],
+      "text": "Hänet sinä olet korottanut oikealle puolellesi,\n\nylemmäksi kaikkia valtoja, voimia ja herruuksia.\n\nHän rukoilee lakkaamatta puolestamme\n\nja antaa meille oikeuden kutsua sinua Isäksemme.\n\nMe kiitämme sinua tästä taivaan lahjasta\n\nja laulamme sinulle ylistystä enkelien ja kaikkien pyhien kanssa:"
+    },
+    {
+      "title": "Prefaation päätös helluntaina",
+      "period": "helluntaina",
+      "appliesTo": [
+        "helluntai"
+      ],
+      "text": "Hänet sinä olet korottanut oikealle puolellesi,\n\nylemmäksi kaikkia valtoja, voimia ja herruuksia.\n\nHänen lupauksensa mukaan sinä olet vuodattanut Pyhän Hengen,\n\nniin että kaikki kansat ja kielet julistaisivat sinun suuria tekojasi.\n\nMe kiitämme sinua tästä taivaan lahjasta\n\nja laulamme sinulle ylistystä enkelien ja kaikkien pyhien kanssa:"
+    },
+    {
+      "title": "Prefaation päätös apostolien päivänä ja Pyhän Henrikin muistopäivänä",
+      "period": "apostolien päivänä ja Pyhän Henrikin muistopäivänä",
+      "appliesTo": [
+        "apostolien-paiva",
+        "pyhan-henrikin-muistopaiva"
+      ],
+      "text": "Hänessä pelastuksen sanoma on tullut maailmaan.\n\nHänestä uskolliset todistajasi ovat kertoneet\n\nja tuoneet evankeliumin myös meidän maahamme.\n\nMe kiitämme sinua tästä taivaan lahjasta\n\nja laulamme sinulle ylistystä enkelien ja kaikkien pyhien kanssa:"
+    },
+    {
+      "title": "Prefaation päätös mikkelinpäivänä",
+      "period": "mikkelinpäivänä",
+      "appliesTo": [
+        "mikkelinpaiva"
+      ],
+      "text": "Sinä annoit Poikasi pelastamaan meidät pahan vallasta\n\nja lähetät pyhät enkelisi johdattamaan ja suojelemaan meitä.\n\nMe kiitämme sinua tästä taivaan lahjasta\n\nja laulamme sinulle ylistystä enkelien ja kaikkien pyhien kanssa:"
+    },
+    {
+      "title": "Prefaation päätös valvomisen sunnuntaina ja tuomiosunnuntaina",
+      "period": "valvomisen sunnuntaina ja tuomiosunnuntaina",
+      "appliesTo": [
+        "valvomisen-sunnuntai",
+        "tuomiosunnuntai"
+      ],
+      "text": "Hänessä sinä olet antanut meille ylösnousemuksen toivon,\n\nettä me voisimme turvallisin mielin odottaa iankaikkista valtakuntaasi.\n\nMe kiitämme sinua tästä taivaan lahjasta\n\nja laulamme sinulle ylistystä enkelien ja kaikkien pyhien kanssa:\n\nPyhä\n\nNämä vaihtoehdot on tarkoitettu käytettäviksi ensisijaisesti muissa kuin\nsunnuntain tai muun pyhäpäivän pääjumalanpalveluksissa.\n\n1.\n\nSävelmä voidaan laatia vapaasti. Virsikirjan jumalanpalvelusliitteessä\nnro 735.\n\n1. Pyhä, pyhä, pyhä! kaikuu kaikki maa.\n\nKaikkivaltiasta, kansat, palvokaa.\n\nPyhyytensä näyttää Herra voimassaan,\n\nmaan ja taivaan täyttää kirkkaudellaan.\n\n2. Hoosianna! soikoon kautta kansojen,\n\nkuninkaamme saapuu luokse ihmisten.\n\nSiunattu hän olkoon, hän on auttaja.\n\nHoosianna soikoon korkeuksissa!"
+    }
+  ],
+  "kyrieLitaniat": [
+    {
+      "season": "Adventtiaika",
+      "slug": "adventtiaika",
+      "texts": [
+        "E Rukoilkaamme Herraa,\n\nettä hän lähettäisi kaikkialle toivon ja rauhan ilosanoman.\n\n[Rukoilkaamme Herraa.]\n\nS Herra, armahda. [Kristus, armahda. Herra, armahda.]\n\nE Rukoilkaamme Herraa,\n\nettä hän kuulisi kärsivien rukoukset.\n\n[Rukoilkaamme Herraa.]\n\nS Herra, armahda. [Kristus, armahda. Herra, armahda.]\n\nE Rukoilkaamme Herraa,\n\nettä hän lähettäisi apunsa sinne,\n\nmissä masennus pimentää toivon.\n\n[Rukoilkaamme Herraa.]\n\nS Herra, armahda. [Kristus, armahda. Herra, armahda.]"
+      ]
+    },
+    {
+      "season": "Joulu ja jouluaika",
+      "slug": "joulu-jouluaika",
+      "texts": [
+        "E Rukoilkaamme Herraa,\n\njoka on täyttänyt lupauksensa,\n\nettä hän olisi kansalleen laupias.\n\n[Rukoilkaamme Herraa.]\n\nS Herra, armahda. [Kristus, armahda. Herra, armahda.]\n\nE Rukoilkaamme Herraa,\n\njoka katsoo kansansa puoleen,\n\nettä hän päästäisi sen kaikesta pahasta.\n\n[Rukoilkaamme Herraa.]\n\nS Herra, armahda. [Kristus, armahda. Herra, armahda.]\n\nE Rukoilkaamme Herraa,\n\njoka on todellinen valo,\n\nettä hän karkottaisi maailman pimeyden ja kuoleman varjon.\n\n[Rukoilkaamme Herraa.]\n\nS Herra, armahda. [Kristus, armahda. Herra, armahda.]",
+        "E Aika on täyttynyt:\n\nJumala lähetti Poikansa vapahtamaan maailman.\n\nRukoilkaamme rauhassa Herraa.\n\nS Herra, armahda. [Kristus, armahda. Herra, armahda.]\n\nE Lupaus on täyttynyt:\n\nSana tuli lihaksi ja asui keskellämme.\n\nRukoilkaamme rauhassa Herraa.\n\nS Herra, armahda. [Kristus, armahda. Herra, armahda.]\n\nE Suuri ilo on tullut kaikille ihmisille:\n\nMeillä on Kristus, Vapahtaja.\n\nRukoilkaamme rauhassa Herraa.\n\nS Herra, armahda. [Kristus, armahda. Herra, armahda.]"
+      ]
+    },
+    {
+      "season": "Paastonaika",
+      "slug": "paastonaika",
+      "texts": [
+        "Tuhkakeskiviikosta lähtien.\n\nE Rukoilkaamme Vapahtajaa,\n\njoka meidän tähtemme tuli köyhäksi,\n\nettä hän köyhyydessään näyttäisi meille rikkautemme.\n\n[Rukoilkaamme Herraa.]\n\nS Herra, armahda. [Kristus, armahda. Herra, armahda.]\n\nE Rukoilkaamme Lunastajaa,\n\njoka ristillä maksoi velkamme,\n\nettä hän ristissään näyttäisi meille sovituksemme.\n\n[Rukoilkaamme Herraa.]\n\nS Herra, armahda. [Kristus, armahda. Herra, armahda.]\n\nE Rukoilkaamme Herraa,\n\njoka nousi kuolleista,\n\nettä hän ylösnousemuksessaan näyttäisi meille elämämme.\n\n[Rukoilkaamme Herraa.]\n\nS Herra, armahda. [Kristus, armahda. Herra, armahda.]"
+      ]
+    },
+    {
+      "season": "Kärsimysaika",
+      "slug": "karsimysaika",
+      "texts": [
+        "5. paastonajan sunnuntaista lähtien.\n\nE Rukoilkaamme kärsivää Herraa,\n\nettä hän avaisi sydämemme antautumaan rakkauden palveluun.\n\n[Rukoilkaamme Herraa.]\n\nS Herra, armahda. [Kristus, armahda. Herra, armahda.]\n\nE Rukoilkaamme häväistyä Kristusta,\n\nettä hän murtaisi ylpeät sydämemme\n\nja avaisi nyrkkiin puristuneet kätemme.\n\n[Rukoilkaamme Herraa.]\n\nS Herra, armahda. [Kristus, armahda. Herra, armahda.]\n\nE Rukoilkaamme ristille naulittua Herraa,\n\nettä hän antaisi meille voimaa kantaa ristiä loppuun asti.\n\n[Rukoilkaamme Herraa.]\n\nS Herra, armahda. [Kristus, armahda. Herra, armahda.]"
+      ]
+    },
+    {
+      "season": "Pitkäperjantai ja hiljainen lauantai",
+      "slug": "pitkaperjantai-hiljainen-lauantai",
+      "texts": [
+        "E Rukoilkaamme Herraa,\n\njoka oli kuuliainen kuolemaan asti,\n\nettä hän opettaisi meidät kuuliaisiksi Isälle.\n\n[Rukoilkaamme Herraa.]\n\nS Herra, armahda. [Kristus, armahda. Herra, armahda.]\n\nE Rukoilkaamme Herraa,\n\njoka laskettiin hautaan,\n\nettä hän karkottaisi tieltämme kuoleman varjon.\n\n[Rukoilkaamme Herraa.]\n\nS Herra, armahda. [Kristus, armahda. Herra, armahda.]\n\nE Rukoilkaamme Herraa,\n\njoka voitti kuoleman,\n\nettä hän antaisi meille uuden elämän toivon.\n\n[Rukoilkaamme Herraa.]\n\nS Herra, armahda. [Kristus, armahda. Herra, armahda.]"
+      ]
+    },
+    {
+      "season": "Pääsiäinen ja pääsiäisaika",
+      "slug": "paasiainen-paasiaisaika",
+      "texts": [
+        "E Rukoilkaamme velkamme maksanutta Vapahtajaa,\n\nettä hänen sovitustyönsä uudistaisi meidät.\n\n[Rukoilkaamme Herraa.]\n\nS Herra, armahda. [Kristus, armahda. Herra, armahda.]\n\nE Rukoilkaamme kuolleista noussutta Herraa,\n\nettä ylösnousemuksen ilo täyttäisi elämämme.\n\n[Rukoilkaamme Herraa.]\n\nS Herra, armahda. [Kristus, armahda. Herra, armahda.]\n\nE Rukoilkaamme ylösnoussutta Herraa,\n\nettä kansat taipuisivat sovintoon keskenään.\n\n[Rukoilkaamme Herraa.]\n\nS Herra, armahda. [Kristus, armahda. Herra, armahda.]"
+      ]
+    },
+    {
+      "season": "Helatorstaista helluntaiaattoon",
+      "slug": "helatorstai-helluntaiaatto",
+      "texts": [
+        "E Rukoilkaamme ylösnousseelta Herralta elämää sinne,\n\nmissä kuolema vallitsee.\n\n[Rukoilkaamme Herraa.]\n\nS Herra, armahda. [Kristus, armahda. Herra, armahda.]\n\nE Rukoilkaamme ylösnousseelta Herralta voimaa niille,\n\njotka tekevät työtä heikkojen ja köyhien hyväksi.\n\n[Rukoilkaamme Herraa.]\n\nS Herra, armahda. [Kristus, armahda. Herra, armahda.]\n\nE Rukoilkaamme taivaaseen astunutta Herraa,\n\nettä hänen Henkensä toisi kaikkialle rauhan.\n\n[Rukoilkaamme Herraa.]\n\nS Herra, armahda. [Kristus, armahda. Herra, armahda.]"
+      ]
+    },
+    {
+      "season": "Helluntai",
+      "slug": "helluntai",
+      "texts": [
+        "E Rukoilkaamme Herraa,\n\nettä hän lähettäisi Henkensä uudistamaan meidät.\n\n[Rukoilkaamme Herraa.]\n\nS Herra, armahda. [Kristus, armahda. Herra, armahda.]\n\nE Rukoilkaamme Herraa,\n\nettä hän lähettäisi Henkensä vahvistamaan Kristukseen kastettujen\nyhteyttä.\n\n[Rukoilkaamme Herraa.]\n\nS Herra, armahda. [Kristus, armahda. Herra, armahda.]\n\nE Rukoilkaamme Herraa,\n\nettä hän lähettäisi Henkensä tekemään meistä hänen todistajiaan.\n\n[Rukoilkaamme Herraa.]\n\nS Herra, armahda. [Kristus, armahda. Herra, armahda.]",
+        "E Rukoilkaamme Herralta Pyhää Henkeä,\n\nettä sairaat ja heikot tuntisivat Kristuksen rakkauden.\n\n[Rukoilkaamme Herraa.]\n\nS Herra, armahda. [Kristus, armahda. Herra, armahda.]\n\nE Rukoilkaamme Herralta Pyhää Henkeä,\n\nettä sokeat silmät ja kuurot korvat avautuisivat\n\nja sorretut pääsisivät vapauteen.\n\n[Rukoilkaamme Herraa.]\n\nS Herra, armahda. [Kristus, armahda. Herra, armahda.]\n\nE Rukoilkaamme Herralta Pyhää Henkeä,\n\nettä hän uudistaisi ja parantaisi kaiken,\n\nminkä synti on turmellut.\n\n[Rukoilkaamme Herraa.]\n\nS Herra, armahda. [Kristus, armahda. Herra, armahda.]"
+      ]
+    }
+  ],
+  "improperia": "jumalanpalvelusliitteessä nro 758.\n\nE Kansani, minun kansani, mitä minä olen tehnyt sinua vastaan?\n\nMillä olen pahoittanut mielesi? Vastaa minulle.\n\nS Pyhä Jumala, pyhä Väkevä, pyhä Kuolematon,\n\narmahda meitä.\n\nE Minä pelastin sinut Egyptin maasta,\n\nmutta sinä olet pystyttänyt ristin Vapahtajallesi.\n\nS Pyhä Jumala, pyhä Väkevä, pyhä Kuolematon,\n\narmahda meitä.\n\nE Minä johdatin sinut autiomaan läpi,\n\nminä ravitsin sinua.\n\nMinä vein sinut hedelmälliseen maahan,\n\nmutta sinä olet pystyttänyt ristin Vapahtajallesi.\n\nS Pyhä Jumala, pyhä Väkevä, pyhä Kuolematon,\n\narmahda meitä.\n\nE Mitä muuta minun olisi pitänyt tehdä sinulle,\n\nmitä en olisi tehnyt?\n\nMinä istutin sinut kuin jalon viinipuun,\n\nmutta sinusta on tullut katkera minua kohtaan.\n\nS Pyhä Jumala, pyhä Väkevä, pyhä Kuolematon,\n\narmahda meitä.\n\nE Minä avasin meren sinun eteesi,\n\nmutta sinä puhkaisit keihäällä minun kylkeni.\n\nS Pyhä Jumala, pyhä Väkevä, pyhä Kuolematon,\n\narmahda meitä.\n\nE Minä annoin sinun juoda kalliosta vettä,\n\nmutta sinä juotit minulle sappea ja etikkaa.\n\nS Pyhä Jumala, pyhä Väkevä, pyhä Kuolematon,\n\narmahda meitä.\n\nE Minä annoin sinun käteesi kuninkaanvaltikan,\n\nmutta sinä panit päähäni orjantappurakruunun.\n\nS Pyhä Jumala, pyhä Väkevä, pyhä Kuolematon,\n\narmahda meitä.\n\nE Minä korotin sinut suuruuteen ja kunniaan,\n\nmutta sinä korotit minut ristille pilkattavaksi.\n\nS Pyhä Jumala, pyhä Väkevä, pyhä Kuolematon,\n\narmahda meitä.\n\nE Ikuisella rakkaudella minä olen rakastanut sinua,\n\nmutta sinä olet pystyttänyt ristin Vapahtajallesi.\n\nS Pyhä Jumala, pyhä Väkevä, pyhä Kuolematon,\n\narmahda meitä.\n\nE Kansani, minun kansani, mitä minä olen tehnyt sinua vastaan?\n\nMillä olen pahoittanut mielesi? Vastaa minulle.\n\nMoitteiden sävelmä\n\n-- kertosäe\n\n-- kertosäe\n\n-- kertosäe\n\n-- kertosäe\n\n-- kertosäe\n\n-- kertosäe\n\n-- kertosäe\n\n-- kertosäe",
+  "synninpaastot": [
+    {
+      "number": 1,
+      "text": "Kaikkivaltias, armollinen Jumala\n\non suuressa laupeudessaan armahtanut meitä.\n\nPoikansa Jeesuksen Kristuksen tähden\n\nhän antaa meille synnit anteeksi\n\nja lahjoittaa elämän ja autuuden.\n\n»Jumala on rakastanut maailmaa niin paljon,\n\nettä antoi ainoan Poikansa,\n\njottei yksikään, joka häneen uskoo,\n\njoutuisi kadotukseen, vaan saisi iankaikkisen elämän.»"
+    },
+    {
+      "number": 2,
+      "text": "»Herra on lähellä niitä, joilla on särkynyt sydän,\n\nhän pelastaa ne, joilla on murtunut mieli.»\n\nJeesuksen Kristuksen palvelijana vakuutan sinulle,\n\nettä Jumala antaa armossaan kaikki sinun syntisi anteeksi."
+    },
+    {
+      "number": 3,
+      "text": "Jumalan sana vakuuttaa meille:\n\n»Tämä sana on varma ja vastaanottamisen arvoinen:\n\nKristus Jeesus on tullut maailmaan pelastamaan syntisiä.»"
+    },
+    {
+      "number": 4,
+      "text": "Anteeksiantava ja laupias on Herra.\n\nHän on kärsivällinen,\n\nja hänen armonsa on suuri.\n\nNiin kuin taivas on korkea maan yllä,\n\nniin on Herran armo suuri\n\nniille, jotka pelkäävät ja rakastavat häntä.\n\nNiin kaukana kuin itä on lännestä,\n\nniin kauas hän siirtää meidän syntimme.\n\nNiin kuin isä armahtaa lapsiaan,\n\nniin armahtaa Herra\n\nniitä, jotka pelkäävät ja rakastavat häntä."
+    },
+    {
+      "number": 5,
+      "text": "Näin sanoo Herra:\n\n»Älä pelkää.\n\nMinä olen lunastanut sinut.\n\nMinä olen sinut nimeltä kutsunut, sinä olet minun.\n\nVaikka vuoret järkkyisivät ja kukkulat horjuisivat,\n\nminun rakkauteni sinuun ei järky\n\neikä minun rauhanliittoni horju.»"
+    },
+    {
+      "number": 6,
+      "text": "Olkaa turvallisella mielellä,\n\nsillä Herra sanoo kaikille katuville:\n\n»Vaikka teidän syntinne ovat verenpunaiset,\n\nne tulevat valkeiksi kuin lumi.\n\nVaikka ne ovat purppuranpunaiset,\n\nne tulevat valkeiksi kuin puhdas villa.»"
+    },
+    {
+      "number": 7,
+      "text": "Jeesus sanoo:\n\n»Ystäväni, ole rohkealla mielellä,\n\nsinun syntisi annetaan anteeksi.»\n\n[Hänen palvelijanaan julistan sinulle tämän synninpäästön\n\nIsän ja (+) Pojan ja Pyhän Hengen nimeen.]"
+    },
+    {
+      "number": 8,
+      "text": "Jos me vaellamme valossa,\n\nniin kuin hän itse on valossa,\n\nmeillä on yhteys toisiimme,\n\nja Jeesuksen, hänen Poikansa,\n\nveri puhdistaa meidät kaikesta synnistä.\n\nJos me tunnustamme syntimme,\n\nniin Jumala, joka on uskollinen ja vanhurskas,\n\nantaa meille synnit anteeksi\n\nja puhdistaa meidät kaikesta vääryydestä."
+    },
+    {
+      "number": 9,
+      "text": "Raamatun sana vakuuttaa,\n\nettä mikään kadotustuomio ei kohtaa niitä,\n\njotka ovat Kristuksessa Jeesuksessa.\n\nHänen palvelijanaan julistan sinulle synnit anteeksi\n\nIsän ja (+) Pojan ja Pyhän Hengen nimeen."
+    },
+    {
+      "number": 10,
+      "text": "Jumala on pyhä,\n\nmutta hän on myös anteeksiantava ja laupias.\n\nHän on kuullut rukouksesi/rukouksenne\n\nja antaa Kristuksen tähden kaikki syntisi/syntinne anteeksi.\n\n[»Kristuksen veressä meillä on lunastus,\n\nrikkomustemme anteeksianto.»]"
+    },
+    {
+      "number": 11,
+      "text": "Kun synnintunnustuksena on käytetty virttä 279, synninpäästönä voidaan\nlaulaa saman virren 6. säkeistö, johon seurakunta vastaa säkeistöllä 7."
+    }
+  ],
+  "kiitosrukoukset": [
+    {
+      "number": 1,
+      "text": "Virsikirjan jumalanpalvelusliitteessä nro 715.\n\nRakas taivaallinen Isä.\n\nKiitos, että annat syntimme anteeksi\n\nJeesuksen tähden.\n\nAuta meitä elämään armosi varassa."
+    },
+    {
+      "number": 2,
+      "text": "Virsikirjan jumalanpalvelusliitteessä nro 716.\n\nJumala, Isämme,\n\nme kiitämme sinua siitä,\n\nettä Jeesus Kristus on avannut tien sinun luoksesi.\n\nVahvista uskoamme, lisää toivoamme\n\nja uudista rakkauttamme."
+    },
+    {
+      "number": 3,
+      "text": "Virsikirjan jumalanpalvelusliitteessä nro 717.\n\nYlistä Herraa, minun sieluni,\n\nja kaikki mitä minussa on,\n\nylistä hänen pyhää nimeään.\n\nYlistä Herraa, minun sieluni,\n\nälä unohda, mitä hyvää hän on sinulle tehnyt.\n\nHän antaa anteeksi kaikki syntini\n\nja parantaa kaikki sairauteni.\n\nHän päästää minut kuoleman otteesta\n\nja seppelöi minut armolla ja rakkaudella."
+    },
+    {
+      "number": 4,
+      "text": "Kun synnintunnustuksena on käytetty virttä 279, kiitosrukouksena voidaan\nlaulaa saman virren 13. säkeistö."
+    }
+  ],
+  "kertosaakeet": [
+    {
+      "number": 5,
+      "title": "Iloitse, tytär Siion",
+      "occasion": "1. adventtisunnuntaina; Sak. 9: 9.",
+      "alternatives": []
+    },
+    {
+      "number": 6,
+      "title": "Iloitkaa aina Herrassa!",
+      "occasion": "Adventtiaikana; Fil. 4: 4--5.",
+      "alternatives": []
+    },
+    {
+      "number": 7,
+      "title": "Katso, pimeys peittää maan",
+      "occasion": "Jouluaattona; Jes. 60: 2.",
+      "alternatives": []
+    },
+    {
+      "number": 8,
+      "title": "Sana tuli lihaksi",
+      "occasion": "Jouluyönä, -aamuna ja -päivänä; Joh. 1: 14.",
+      "alternatives": []
+    },
+    {
+      "number": 9,
+      "title": "Jumalan sädehtivä kirkkaus",
+      "occasion": "Tapaninpäivänä ja jouluaikana; Hepr. 1: 3; Joh. 1: 14.",
+      "alternatives": []
+    },
+    {
+      "number": 10,
+      "title": "Tulkaa, kumartukaamme maahan",
+      "occasion": "Loppiaisena; Ps. 95: 6.",
+      "alternatives": []
+    },
+    {
+      "number": 11,
+      "title": "Kiittäkää Herraa",
+      "occasion": "Loppiaisaikana; Ps. 105: 1.",
+      "alternatives": []
+    },
+    {
+      "number": 12,
+      "title": "Nouse auttamaan meitä, Herra",
+      "occasion": "Paastonaikaa edeltävinä sunnuntaina; Ps. 44: 27.",
+      "alternatives": []
+    },
+    {
+      "number": 13,
+      "title": "Ole minulle kallio",
+      "occasion": "Laskiaissunnuntaina; Ps. 31: 3.",
+      "alternatives": []
+    },
+    {
+      "number": 14,
+      "title": "Käänny puoleeni, Herra",
+      "occasion": "Paastonajan alkupuolella; Ps. 25: 16.",
+      "alternatives": []
+    },
+    {
+      "number": 15,
+      "title": "Onnellisia ne, jotka saavat voimansa sinusta",
+      "occasion": "4. paastonajan sunnuntaina; Ps. 84: 6.",
+      "alternatives": []
+    },
+    {
+      "number": 16,
+      "title": "Hanki minulle oikeutta, Jumala",
+      "occasion": "5. paastonajan sunnuntaina; Ps. 43: 1, 3.",
+      "alternatives": []
+    },
+    {
+      "number": 17,
+      "title": "Hoosianna! Siunattu olkoon hän",
+      "occasion": "Palmusunnuntaina; Ps. 118: 26.",
+      "alternatives": []
+    },
+    {
+      "number": 18,
+      "title": "Iäti muistettavia ovat ihmeet",
+      "occasion": "Kiirastorstaina; Ps. 111: 4.",
+      "alternatives": []
+    },
+    {
+      "number": 19,
+      "title": "Jumalani, Jumalani, miksi hylkäsit minut",
+      "occasion": "Pitkäperjantaina; Ps. 22: 2.",
+      "alternatives": []
+    },
+    {
+      "number": 20,
+      "title": "Halleluja",
+      "occasion": "Pääsiäisyönä, -aamuna ja -päivänä.",
+      "alternatives": []
+    },
+    {
+      "number": 21,
+      "title": "Laulakaa Herralle uusi laulu",
+      "occasion": "Pääsiäisaikana; Ps. 96: 1.",
+      "alternatives": []
+    },
+    {
+      "number": 22,
+      "title": "Kun sinä lähetät henkesi",
+      "occasion": "Helluntaina; Ps. 104: 30.",
+      "alternatives": []
+    },
+    {
+      "number": 23,
+      "title": "Ylistetty olkoon Pyhä Kolminaisuus",
+      "occasion": "Pyhän Kolminaisuuden päivänä.",
+      "alternatives": []
+    },
+    {
+      "number": 24,
+      "title": "Jumala on turvamme ja linnamme",
+      "occasion": "Uskonpuhdistuksen muistopäivänä; Ps. 46: 2.",
+      "alternatives": []
+    },
+    {
+      "number": 25,
+      "title": "Maan ääriin saakka kiiriköön nimesi",
+      "occasion": "Kynttilänpäivänä; Ps. 48: 11.",
+      "alternatives": []
+    },
+    {
+      "number": 26,
+      "title": "Sydämeni riemuitsee Herrasta",
+      "occasion": "Marian ilmestyspäivänä; 1. Sam. 2: 1; Luuk. 1: 46.",
+      "alternatives": []
+    },
+    {
+      "number": 27,
+      "title": "Hyvä on Herraa kiittää",
+      "occasion": "Juhannuspäivänä; ks. nro 1.",
+      "alternatives": []
+    },
+    {
+      "number": 28,
+      "title": "Sinä olet tullut avukseni",
+      "occasion": "Mikkelinpäivänä; Ps. 63: 8.",
+      "alternatives": []
+    },
+    {
+      "number": 29,
+      "title": "Herra on ikuinen valosi",
+      "occasion": "Pyhäinpäivänä; Jes. 60: 19.",
+      "alternatives": []
+    },
+    {
+      "number": 30,
+      "title": "Suuri on Herra",
+      "occasion": "Pyhän Henrikin muistopäivänä; Ps. 35: 27.",
+      "alternatives": []
+    },
+    {
+      "number": 31,
+      "title": "Olkoon rukoukseni edessäsi uhrisavuna",
+      "occasion": "",
+      "alternatives": []
+    }
+  ]
+}

@@ -1,0 +1,14 @@
+{
+  "name": "kirkkovuosi-api",
+  "version": "1.0.0",
+  "description": "Church year calendar and lectionary API for the Evangelical-Lutheran Church of Finland",
+  "type": "module",
+  "main": "src/index.js",
+  "scripts": {
+    "start": "node src/index.js",
+    "dev": "node --watch src/index.js",
+    "test": "node --test src/tests/*.test.js"
+  },
+  "keywords": ["kirkkovuosi", "church-year", "lectionary", "lutheran", "finland"],
+  "license": "ISC"
+}
