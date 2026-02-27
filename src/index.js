@@ -109,6 +109,10 @@ const server = createServer((req, res) => {
           'GET /api/v1/propers/kiitosrukoukset — Thanksgiving prayers',
           'GET /api/v1/propers/kertosaakeet — Seasonal psalm refrains',
           'GET /api/v1/propers/improperia — Good Friday Improperia',
+          'GET /api/v1/lectionary — Lectionary index metadata',
+          'GET /api/v1/lectionary/holy-days — All holy day names in the lectionary',
+          'GET /api/v1/lectionary/by-holy-day?q=pääsiäisyö — Readings for a holy day',
+          'GET /api/v1/lectionary/search?q=Matt.+5 — Search lectionary by Bible reference',
         ],
       });
       return;

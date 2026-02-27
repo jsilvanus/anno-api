@@ -9,6 +9,9 @@ import {
   getAllKiitosrukoukset, getAllKertosaakeet, getImproperia,
   getPropers,
 } from '../services/propers.js';
+import {
+  getIndexMeta, getByHolyDay, searchByReference, getHolyDayNames,
+} from '../services/lectionary.js';
 
 /**
  * Register all routes on the HTTP server.
@@ -241,5 +244,38 @@ export function registerRoutes(routes) {
   // GET /api/v1/propers/improperia — Good Friday Improperia
   routes.get('/api/v1/propers/improperia', (req) => {
     return { source: 'Jumalanpalvelusten kirja (2000)', improperia: getImproperia() };
+  });
+
+  // ─── LECTIONARY INDEX (viikkolektionaarin_raamatunkohdat) ────────────
+
+  // GET /api/v1/lectionary — Index metadata
+  routes.get('/api/v1/lectionary', (req) => {
+    return getIndexMeta();
+  });
+
+  // GET /api/v1/lectionary/holy-days — List all holy day names in the index
+  routes.get('/api/v1/lectionary/holy-days', (req) => {
+    return { holyDays: getHolyDayNames() };
+  });
+
+  // GET /api/v1/lectionary/by-holy-day?q=pääsiäisyö — Readings for a holy day
+  routes.get('/api/v1/lectionary/by-holy-day', (req) => {
+    const q = (req.query.q || '').trim();
+    if (!q) {
+      return { error: 'Query parameter ?q= is required. Example: ?q=pääsiäisyö' };
+    }
+    const results = getByHolyDay(q);
+    const count = Object.values(results).reduce((n, arr) => n + arr.length, 0);
+    return { query: q, matchedDays: Object.keys(results).length, count, results };
+  });
+
+  // GET /api/v1/lectionary/search?q=Matt.+5 — Search by Bible reference
+  routes.get('/api/v1/lectionary/search', (req) => {
+    const q = (req.query.q || '').trim();
+    if (!q) {
+      return { error: 'Query parameter ?q= is required. Example: ?q=Matt.+5' };
+    }
+    const results = searchByReference(q);
+    return { query: q, count: results.length, results };
   });
 }
