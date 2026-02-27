@@ -49,8 +49,22 @@ src/
 
 To regenerate the lectionary index after changing the PDF:
 ```bash
-pdftotext viikkolektionaarin_raamatunkohdat.pdf src/data/lectionary-index.txt
+pdftotext refs/viikkolektionaarin_raamatunkohdat.pdf src/data/lectionary-index.txt
 node src/parsers/parse-lectionary-index.js
+```
+
+## Reference documents
+
+Source documents used to generate the data files are kept in `refs/`:
+
+| File | Description |
+|---|---|
+| `refs/jpkirja.doc` | Jumalanpalvelusten kirja (Kirkkokäsikirja I) — source for propers |
+| `refs/viikkolektionaarin_raamatunkohdat.pdf` | Source PDF for lectionary Bible index |
+
+To parse jpkirja, first convert the `.doc` to markdown (e.g. with pandoc), then run:
+```bash
+node src/parsers/parse-jpkirja.js refs/jpkirja.md src/data
 ```
 
 ## Testing

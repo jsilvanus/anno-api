@@ -121,7 +121,9 @@ Index of all Bible passages used in the Evankeliumikirja and weekly lectionary, 
 ```
 anno-api/
 ├── package.json
-├── viikkolektionaarin_raamatunkohdat.pdf   source PDF for lectionary index
+├── refs/
+│   ├── jpkirja.doc                         source DOC for liturgical propers
+│   └── viikkolektionaarin_raamatunkohdat.pdf   source PDF for lectionary index
 └── src/
     ├── index.js            HTTP server and router
     ├── routes/
