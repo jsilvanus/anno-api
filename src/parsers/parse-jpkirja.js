@@ -8,7 +8,8 @@
  * - Pääsiäisylistys / Exsultet (Easter)
  * - Kertosäkeet (psalm refrains by season)
  * - Synninpäästöt (absolutions)
- * - Kiitosrukoukset (thanksgiving prayers)
+ * - Kiitosrukoukset (general thanksgiving prayers, numbered 1–4)
+ * - Kiitosrukoukset ehtoollisen jälkeen (church-year post-communion thanksgiving prayers)
  * - Sakaristorukouksia (sacristy prayers)
  * - Päivän rukouksia (collects for daily offices)
  */
@@ -310,6 +311,84 @@ function parseKiitosrukoukset(lines) {
   return parseNumberedTexts(sectionLines);
 }
 
+// ─── Kiitosrukouksia ehtoollisen jälkeen (Post-Communion Thanksgiving) Parser ─
+
+/**
+ * Parses church-year-specific post-communion thanksgiving prayers.
+ *
+ * In the jpkirja the "Kiitosrukous" section starts with general numbered prayers
+ * (1–4) and then continues with season-specific variants:
+ *   Adventtiaika, Jouluaika, Paastonaika (from Ash Wednesday),
+ *   Kärsimysaika (from 5th Sunday of Lent), Pääsiäinen, Pääsiäisaika, Helluntai.
+ *
+ * These follow directly after the numbered prayers in the same Kiitosrukoukset
+ * section, before the next major heading (Perhejumalanpalvelukset).
+ */
+function parseKiitosrukouksetEhtoollinen(lines) {
+  // Find the Kiitosrukoukset section anchor
+  const sectionStart = findLine(lines, /^.*Kiitosrukous\[.*Kiitosrukoukset/);
+  if (sectionStart === -1) return [];
+
+  // Find the end of the whole kiitosrukous block (next major heading after numbered texts)
+  const nextMajor = findLine(lines.slice(sectionStart + 1), /Perhejumalanpalvelukset/);
+  const sectionEnd = nextMajor !== -1 ? sectionStart + 1 + nextMajor : sectionStart + 400;
+
+  const sectionLines = lines.slice(sectionStart + 1, sectionEnd);
+
+  // Season definitions — title, slug, optional note about when it applies
+  const seasons = [
+    { regex: /^Adventtiaika$/,       name: 'Adventtiaika',  slug: 'adventtiaika',  note: null },
+    { regex: /^Joulu(aika)?$/,        name: 'Jouluaika',     slug: 'jouluaika',     note: null },
+    { regex: /^Paastonaika$/,         name: 'Paastonaika',   slug: 'paastonaika',   note: 'Tuhkakeskiviikosta lähtien' },
+    { regex: /^K[äa]rsimysaika$/,     name: 'Kärsimysaika',  slug: 'karsimysaika',  note: '5. paastonajan sunnuntaista lähtien' },
+    { regex: /^P[äa][äa]si[äa]inen$/, name: 'Pääsiäinen',   slug: 'paasiaisyo-paasiaispaiva', note: null },
+    { regex: /^P[äa][äa]si[äa]isaika$/, name: 'Pääsiäisaika', slug: 'paasiaisaika', note: null },
+    { regex: /^Helluntai$/,           name: 'Helluntai',     slug: 'helluntai',     note: null },
+  ];
+
+  const results = [];
+
+  for (let s = 0; s < seasons.length; s++) {
+    const idx = sectionLines.findIndex(l => seasons[s].regex.test(l.trim()));
+    if (idx === -1) continue;
+
+    // Find end of this season's block
+    let endIdx = sectionLines.length;
+    for (let next = s + 1; next < seasons.length; next++) {
+      const nextIdx = sectionLines.findIndex((l, i) => i > idx && seasons[next].regex.test(l.trim()));
+      if (nextIdx !== -1) {
+        endIdx = nextIdx;
+        break;
+      }
+    }
+
+    // Collect prayer text(s) — split on blank lines or "tai" separators
+    const raw = sectionLines.slice(idx + 1, endIdx).join('\n');
+    const texts = raw
+      .split(/\n\s*tai\s*\n|\n{3,}/)
+      .map(t => cleanText(stripImages(t)))
+      .filter(t => t.length > 20);
+
+    // Extract note (usually a line like "Tuhkakeskiviikosta lähtien" right after heading)
+    let note = seasons[s].note;
+    if (!note) {
+      const firstLine = sectionLines[idx + 1]?.trim();
+      if (firstLine && /lähtien|alkaen|sunnuntai/.test(firstLine)) {
+        note = cleanText(firstLine);
+      }
+    }
+
+    results.push({
+      season: seasons[s].name,
+      slug: seasons[s].slug,
+      ...(note ? { note } : {}),
+      texts,
+    });
+  }
+
+  return results;
+}
+
 // ─── Kertosäkeet (Psalm Refrains) Parser ────────────────────────────────────
 
 function parseKertosaakeet(lines) {
@@ -464,6 +543,10 @@ function main() {
   const kiitosrukoukset = parseKiitosrukoukset(lines);
   console.log(`  Found ${kiitosrukoukset.length} thanksgiving prayers`);
 
+  console.log('Parsing kiitosrukouksia ehtoollisen jälkeen...');
+  const kiitosrukouksetEhtoollinen = parseKiitosrukouksetEhtoollinen(lines);
+  console.log(`  Found ${kiitosrukouksetEhtoollinen.length} seasonal post-communion thanksgiving prayers`);
+
   console.log('Parsing kertosäkeet...');
   const kertosaakeet = parseKertosaakeet(lines);
   console.log(`  Found ${kertosaakeet.length} psalm refrains`);
@@ -476,6 +559,7 @@ function main() {
     improperia,
     synninpaastot,
     kiitosrukoukset,
+    kiitosrukouksetEhtoollinen,
     kertosaakeet,
   };
 
