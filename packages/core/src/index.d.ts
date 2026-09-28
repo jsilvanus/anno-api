@@ -108,7 +108,6 @@ export interface ResolvedDate {
   holyDay: Day | null;
   additionalServices: Day[];
   weekdayMaterial: Day | null;
-  precedingSunday: { name: string; slug: string; date: string | null } | null;
   liturgicalColor: LiturgicalColor | null;
   liturgy: Liturgy;
 }
@@ -152,7 +151,6 @@ export function getDayData(slug: string): RawDay | null;
 export function getAllDays(): RawDay[];
 export function getPeriods(): { name: string; season: string; description: string }[];
 export function getChurchYearCalendar(startYear: number): { churchYear: ChurchYear; entries: CalendarEntry[] };
-export function getSeasonEntries(startYear: number, season: string): unknown;
 
 export function easterSunday(year: number): Date;
 export function makeDate(year: number, month: number, day: number): Date;

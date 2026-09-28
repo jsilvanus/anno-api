@@ -59,7 +59,6 @@ function selectDay(date, query) {
     day,
     header: {
       date,
-      holyDay: day?.name ?? null,
       day: day ? summary(day) : null,
       alsoOnThisDate: all.filter(d => d !== day).map(summary),
     },
@@ -80,7 +79,6 @@ function textsView(date, query) {
   }
   return {
     ...header,
-    materialFrom: day && !resolved.holyDay ? day.name : null,
     yearCycle: cycle ?? resolved.churchYear.yearCycle,
     texts,
     psalm: day?.psalm ?? null,
@@ -122,7 +120,7 @@ function colorView(date, query) {
   const picked = selectDay(date, query);
   if (picked.error) return picked;
   const { day, header } = picked;
-  return { ...header, liturgicalColor: day?.liturgicalColor?.color ?? null, color: day?.liturgicalColor ?? null };
+  return { ...header, liturgicalColor: day?.liturgicalColor ?? null };
 }
 
 function liturgyView(date, query) {

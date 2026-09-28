@@ -11,7 +11,8 @@ GET /api/v1/date/2026-03-01/liturgy
 ```json
 {
   "date": "2026-03-01",
-  "holyDay": "2. paastonajan sunnuntai",
+  "day": { "name": "2. paastonajan sunnuntai", "slug": "2-paastonajan-sunnuntai", "type": "sunday" },
+  "alsoOnThisDate": [],
   "liturgy": {
     "gloria": false,
     "hallelujah": false,

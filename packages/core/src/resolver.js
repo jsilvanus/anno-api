@@ -287,8 +287,6 @@ export function resolveDate(date, { allYearCycles = true } = {}) {
     holyDay,
     additionalServices,
     weekdayMaterial,
-    // Kept for backward compatibility: the day whose material a weekday uses
-    precedingSunday: weekdayMaterial && { name: weekdayMaterial.name, slug: weekdayMaterial.slug, date: weekdayMaterial.date },
     liturgicalColor: day?.liturgicalColor ?? null,
     // Rubrics of the day's main service; each day and service also carries its own
     liturgy: day?.liturgy ?? liturgicalRules(date, calendar, null),
@@ -346,35 +344,5 @@ export function getChurchYearCalendar(startYear) {
         ...(e.replaces ? { replaces: e.replaces } : {}),
       };
     }),
-  };
-}
-
-/**
- * Get entries for a specific season.
- */
-export function getSeasonEntries(startYear, season) {
-  loadData();
-
-  const seasonMap = {
-    advent: 'Adventtiaika',
-    christmas: 'Jouluaika',
-    epiphany: 'Loppiaisaika',
-    lent: 'Paastonaika',
-    easter: 'Pääsiäisaika',
-    pentecost: 'Helluntain jälkeinen aika',
-  };
-
-  const periodName = seasonMap[season.toLowerCase()];
-  if (!periodName) return null;
-
-  const calendar = getCalendar(startYear);
-  const yearCycle = getYearCycle(startYear);
-
-  const matching = calendar.filter(e => getDayData(e.slug)?.period === periodName);
-
-  return {
-    season,
-    churchYear: churchYearInfo(startYear),
-    entries: matching.map(e => enrichEntry(e, yearCycle, { allYearCycles: false })),
   };
 }

@@ -14,7 +14,6 @@
 | `holyDay` | Day \| null | The date's own holy day, or `null` on a plain weekday |
 | `additionalServices` | Day[] | Other days on the date: services (jouluyö, pääsiäisyö, Jeesuksen kuolinhetki), a Sunday that coincides with a feast, and observances (rukouspäivät, Pyhän Henrikin muistopäivä) |
 | `weekdayMaterial` | Day \| null | On a weekday without its own holy day: the day whose texts, prayers and colour are used |
-| `precedingSunday` | object \| null | `{ name, slug, date }` of `weekdayMaterial` (kept for compatibility) |
 | `liturgicalColor` | Color | Colour of the day (see below) |
 | `liturgy` | object | Seasonal rubrics of the Mass (see below) |
 
@@ -35,7 +34,7 @@ Weekdays use the material of the week's Sunday ("Arkipäivinä käytetään … 
 |---|---|---|
 | `name`, `slug` | string | Finnish name and identifier |
 | `date` | string \| null | Date in the church year |
-| `type` | string | `sunday`, `feast`, `day`, `service`, `observance`, `weekday`, `weekdayMaterial` |
+| `type` | string | `sunday`, `feast`, `day`, `service`, `observance`, `weekday`, or `weekdayMaterial` on a weekday using another day's material |
 | `theme` | string \| null | Theme of the day, e.g. `"Kuninkaasi tulee nöyränä"` |
 | `latinName` | string \| null | e.g. `Laetare`, `Rogate` |
 | `alternativeName` | string \| null | e.g. `"3. joulupäivä"`, `"Enkelien sunnuntai"` |

@@ -12,7 +12,7 @@ export {
   ENTRY_TYPES,
 } from './computus.js';
 export {
-  resolveDate, getHolyDay, getDayData, getAllDays, getPeriods, getChurchYearCalendar, getSeasonEntries,
+  resolveDate, getHolyDay, getDayData, getAllDays, getPeriods, getChurchYearCalendar,
 } from './resolver.js';
 export {
   getPropers, getSeasonKeys, getPrefaatio, getKyrieLitania, getKertosae, getPostCommunionPrayer,
