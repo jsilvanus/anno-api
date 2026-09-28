@@ -1,14 +1,25 @@
 {
-  "name": "kirkkovuosi-api",
-  "version": "1.0.0",
-  "description": "Church year calendar and lectionary API for the Evangelical-Lutheran Church of Finland",
+  "name": "anno-api",
+  "version": "2.0.0",
+  "private": true,
+  "description": "Church year calendar, lectionary and liturgical propers of the Evangelical-Lutheran Church of Finland — REST API and MCP server",
   "type": "module",
-  "main": "src/index.js",
+  "workspaces": [
+    "packages/core",
+    "packages/api",
+    "packages/mcp"
+  ],
   "scripts": {
-    "start": "node src/index.js",
-    "dev": "node --watch src/index.js",
-    "test": "node --test src/tests/*.test.js"
+    "start": "npm start -w @anno-api/api",
+    "dev": "npm run dev -w @anno-api/api",
+    "start:mcp": "npm start -w @anno-api/mcp",
+    "dev:mcp": "npm run dev -w @anno-api/mcp",
+    "build": "npm run build --workspaces --if-present",
+    "test": "npm test --workspaces --if-present"
   },
-  "keywords": ["kirkkovuosi", "church-year", "lectionary", "lutheran", "finland"],
+  "engines": {
+    "node": ">=22.5"
+  },
+  "keywords": ["kirkkovuosi", "church-year", "lectionary", "lutheran", "finland", "mcp"],
   "license": "ISC"
 }

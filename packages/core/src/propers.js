@@ -31,50 +31,41 @@ function loadPropers() {
  * @param {Object} dayData - Parsed day data from Evankeliumikirja
  * @returns {string[]} Matching season keys for propers lookup
  */
-function getSeasonKeys(slug, dayData) {
+export function getSeasonKeys(slug, dayData) {
   const keys = [];
   const period = dayData?.period || '';
-  const season = dayData?.season || '';
 
-  // Specific day mappings
+  // Christmas
   if (slug === '1-adventtisunnuntai') keys.push('1-adventtisunnuntai');
-  if (slug.includes('adventti')) keys.push('adventtiaika');
+  if (period === 'Adventtiaika' || slug.includes('adventti')) keys.push('adventtiaika');
   if (slug === 'jouluaatto') keys.push('jouluaatto', 'jouluaika');
   if (slug === 'jouluyo') keys.push('jouluyo', 'jouluaika');
-  if (slug === 'joulupaiva') keys.push('joulupaiva', 'jouluaika');
-  if (slug === 'tapaninpaiva') keys.push('jouluaika');
-  if (slug.includes('sunnuntai-joulusta')) keys.push('jouluaika');
-  if (slug === 'uudenvuodenpaiva') keys.push('jouluaika');
+  if (slug === 'jouluaamu' || slug === 'joulupaiva') keys.push('joulupaiva', 'jouluaika');
   if (slug === 'loppiainen') keys.push('loppiainen');
-  if (slug.includes('sunnuntai-loppiaisesta')) keys.push('loppiaisaika', 'paastonaikaa-edeltavat');
-  if (slug.includes('ennen-paastonaikaa')) keys.push('loppiaisaika', 'paastonaikaa-edeltavat');
-  if (slug === 'laskiaissunnuntai') keys.push('loppiaisaika', 'paastonaikaa-edeltavat');
-  if (slug === 'tuhkakeskiviikko') keys.push('paastonaika');
-  if (slug.match(/\d-paastonajan-sunnuntai/)) {
-    keys.push('paastonaika');
-    // 5. paastonajan sunnuntaista lähtien = kärsimysaika
-    const num = parseInt(slug);
-    if (num >= 5) keys.push('karsimysaika');
-  }
-  if (slug === 'palmusunnuntai') keys.push('karsimysaika');
-  if (slug.includes('hiljaisen-viikon')) keys.push('karsimysaika');
-  if (slug === 'kiirastorstai') keys.push('karsimysaika');
-  if (slug === 'pitkaperjantai') keys.push('karsimysaika', 'pitkaperjantai');
-  if (slug === 'hiljainen-lauantai') keys.push('karsimysaika');
+  if (period === 'Jouluaika' && slug !== 'loppiainen') keys.push('jouluaika');
+  if (period === 'Loppiaisaika' && slug !== 'loppiainen') keys.push('loppiaisaika', 'paastonaikaa-edeltavat');
+  if (period === 'Paastonaikaa edeltävät sunnuntait') keys.push('loppiaisaika', 'paastonaikaa-edeltavat');
+
+  // Lent and Holy Week: kärsimysaika from 5. paastonajan sunnuntai
+  const passiontide = slug === '5-paastonajan-sunnuntai' || slug === 'palmusunnuntai' ||
+    slug.startsWith('hiljai') || ['kiirastorstai', 'pitkaperjantai', 'jeesuksen-kuolinhetki', 'pitkaperjantain-ilta'].includes(slug);
+  if (['pitkaperjantai', 'jeesuksen-kuolinhetki', 'pitkaperjantain-ilta', 'hiljainen-lauantai'].includes(slug)) keys.push('pitkaperjantai');
+  if (passiontide) keys.push('karsimysaika');
+  if (period === 'Paastonaika') keys.push('paastonaika');
+
+  // Easter
   if (slug === 'paasiaisyo') keys.push('paasiaisyo', 'paasiaispaiva');
   if (slug === 'paasiaispaiva') keys.push('paasiaispaiva');
-  if (slug === '2-paasiaispaiva') keys.push('paasiaisaika');
-  if (slug.includes('jalkeinen') && slug.includes('paasiai')) keys.push('paasiaisaika');
-  if (slug.match(/\d-sunnuntai-paasiaisesta/)) keys.push('paasiaisaika');
-  if (slug === 'helatorstai') keys.push('helatorstai-helluntaiaatto');
-  if (slug === '6-sunnuntai-paasiaisesta') keys.push('helatorstai-helluntaiaatto');
-  if (slug === 'helluntaiaatto') keys.push('helatorstai-helluntaiaatto');
-  if (slug === 'helluntaipaiva') keys.push('helluntai');
-  if (slug === 'apostolien-paiva') keys.push('apostolien-paiva');
-  if (slug === 'pyhan-henrikin-muistopaiva') keys.push('pyhan-henrikin-muistopaiva');
-  if (slug === 'mikkelinpaiva') keys.push('mikkelinpaiva');
-  if (slug === 'valvomisen-sunnuntai') keys.push('valvomisen-sunnuntai');
-  if (slug === 'tuomiosunnuntai') keys.push('tuomiosunnuntai');
+  if (period === 'Pääsiäisaika') keys.push('paasiaisaika');
+  if (['helatorstai', '6-sunnuntai-paasiaisesta', 'helluntaiaatto'].includes(slug)) keys.unshift('helatorstai-helluntaiaatto');
+
+  // Pentecost
+  if (slug === 'helluntaipaiva' || slug.startsWith('helluntain-jalkeinen-viikko')) keys.push('helluntai');
+
+  // Days with their own propers
+  for (const own of ['apostolien-paiva', 'pyhan-henrikin-muistopaiva', 'mikkelinpaiva', 'valvomisen-sunnuntai', 'tuomiosunnuntai']) {
+    if (slug === own) keys.push(own);
+  }
   if (slug === 'kynttilanpaiva') keys.push('kynttilanpaiva', 'jouluaika');
   if (slug === 'marian-ilmestyspaiva') keys.push('marian-ilmestyspaiva', 'jouluaika');
 
@@ -94,15 +85,15 @@ export function getPrefaatio(slug, dayData) {
   const propers = loadPropers();
   const seasonKeys = getSeasonKeys(slug, dayData);
 
-  for (const prefaatio of propers.prefaatiot) {
-    for (const appliesTo of prefaatio.appliesTo) {
-      if (seasonKeys.includes(appliesTo)) {
-        return {
-          title: prefaatio.title,
-          period: prefaatio.period,
-          text: prefaatio.text,
-        };
-      }
+  // Season keys are ordered from most to least specific.
+  for (const key of seasonKeys) {
+    const prefaatio = propers.prefaatiot.find(p => p.appliesTo.includes(key));
+    if (prefaatio) {
+      return {
+        title: prefaatio.title,
+        period: prefaatio.period,
+        text: prefaatio.text,
+      };
     }
   }
 
@@ -161,7 +152,17 @@ export function getKertosae(slug, dayData) {
     'adventtiaika': 'Adventtiaikana',
     'jouluaatto': 'Jouluaattona',
     'jouluyo': 'Jouluyönä',
+    'jouluaamu': '-aamuna',
     'joulupaiva': 'joulupäivänä',
+    'apostoli-johanneksen-paiva': 'jouluaikana',
+    'viattomien-lasten-paiva': 'jouluaikana',
+    '3-sunnuntai-ennen-paastonaikaa': 'Paastonaikaa edeltävinä',
+    '2-sunnuntai-ennen-paastonaikaa': 'Paastonaikaa edeltävinä',
+    '1-paastonajan-sunnuntai': 'Paastonajan alkupuolella',
+    '2-paastonajan-sunnuntai': 'Paastonajan alkupuolella',
+    '3-paastonajan-sunnuntai': 'Paastonajan alkupuolella',
+    '4-paastonajan-sunnuntai': '4. paastonajan',
+    '5-paastonajan-sunnuntai': '5. paastonajan',
     'tapaninpaiva': 'Tapaninpäivänä',
     'loppiainen': 'Loppiaisena',
     'laskiaissunnuntai': 'Laskiaissunnuntaina',
@@ -187,19 +188,17 @@ export function getKertosae(slug, dayData) {
   // Also match by season
   const seasonKeys = getSeasonKeys(slug, dayData);
   for (const key of seasonKeys) {
+    if (key === 'adventtiaika') keywords.push('Adventtiaikana');
     if (key === 'loppiaisaika') keywords.push('Loppiaisaikana');
-    if (key === 'paastonaika') keywords.push('Paastonajan', 'paastonajan');
+    if (key === 'paastonaika' && !seasonKeys.includes('karsimysaika')) keywords.push('Paastonajan alkupuolella');
     if (key === 'paasiaisaika') keywords.push('Pääsiäisaikana');
     if (key === 'jouluaika') keywords.push('jouluaikana');
   }
 
-  for (const refrain of propers.kertosaakeet) {
-    const occasion = refrain.occasion || '';
-    for (const keyword of keywords) {
-      if (occasion.includes(keyword)) {
-        return refrain;
-      }
-    }
+  // Keywords are ordered from most to least specific.
+  for (const keyword of keywords) {
+    const refrain = propers.kertosaakeet.find(r => (r.occasion || '').includes(keyword));
+    if (refrain) return refrain;
   }
 
   return null;
@@ -215,7 +214,38 @@ export function getPropers(slug, dayData) {
     prefaatio: getPrefaatio(slug, dayData),
     kyrieLitania: getKyrieLitania(slug, dayData),
     kertosae: getKertosae(slug, dayData),
+    postCommunionPrayer: getPostCommunionPrayer(slug, dayData),
   };
+}
+
+// ─── Kiitosrukous ehtoollisen jälkeen (post-communion prayer) ───────────────
+
+/**
+ * Get the seasonal thanksgiving prayer after communion. Outside the seasons
+ * listed in Jumalanpalvelusten kirja the prayer is chosen freely (null).
+ */
+export function getPostCommunionPrayer(slug, dayData) {
+  const propers = loadPropers();
+  const seasonKeys = getSeasonKeys(slug, dayData);
+  const mapping = {
+    'adventtiaika': 'adventtiaika',
+    'jouluaatto': 'jouluaika',
+    'jouluyo': 'jouluaika',
+    'joulupaiva': 'jouluaika',
+    'jouluaika': 'jouluaika',
+    'karsimysaika': 'karsimysaika',
+    'paastonaika': 'paastonaika',
+    'paasiaisyo': 'paasiaisyo-paasiaispaiva',
+    'paasiaispaiva': 'paasiaisyo-paasiaispaiva',
+    'paasiaisaika': 'paasiaisaika',
+    'helatorstai-helluntaiaatto': 'paasiaisaika',
+    'helluntai': 'helluntai',
+  };
+  for (const key of seasonKeys) {
+    const found = propers.kiitosrukouksetEhtoollinen?.find(k => k.slug === mapping[key]);
+    if (found) return found;
+  }
+  return null;
 }
 
 // ─── Direct Access ──────────────────────────────────────────────────────────
@@ -253,6 +283,13 @@ export function getAllKiitosrukoukset() {
  */
 export function getAllKertosaakeet() {
   return loadPropers().kertosaakeet;
+}
+
+/**
+ * Get all seasonal thanksgiving prayers after communion.
+ */
+export function getAllKiitosrukouksetEhtoollinen() {
+  return loadPropers().kiitosrukouksetEhtoollinen;
 }
 
 /**

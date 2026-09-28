@@ -11,8 +11,8 @@ import {
   generateChurchYear,
   getYearCycle,
   getChurchYearStart,
-} from '../services/computus.js';
-import { resolveDate, getDayData } from '../services/resolver.js';
+} from '../src/computus.js';
+import { resolveDate, getDayData } from '../src/resolver.js';
 
 // ─── Easter Calculation ─────────────────────────────────────────────────────
 
@@ -105,11 +105,11 @@ describe('Church year generation', () => {
 
 describe('Year cycle calculation', () => {
   it('cycles through 1, 2, 3', () => {
-    // 2024 → cycle 3, 2025 → cycle 1, 2026 → cycle 2
+    // Perikooppikalenterit: 2024–2025 → 1. vsk, 2025–2026 → 2. vsk, 2026–2027 → 3. vsk
     const cycles = [2024, 2025, 2026].map(getYearCycle);
-    assert.deepEqual(cycles, [3, 1, 2]);
+    assert.deepEqual(cycles, [1, 2, 3]);
     // And wraps back
-    assert.equal(getYearCycle(2027), 3);
+    assert.equal(getYearCycle(2027), 1);
   });
 
   it('determines church year start correctly', () => {
@@ -141,9 +141,9 @@ describe('Date resolution', () => {
 
   it('resolves a weekday correctly', () => {
     const result = resolveDate('2026-02-03'); // A Tuesday
-    // Should either be a holy day or have a preceding Sunday
+    // Should either be a holy day or use a Sunday's material
     if (!result.holyDay) {
-      assert.ok(result.precedingSunday, 'Should have a preceding Sunday');
+      assert.ok(result.weekdayMaterial, 'Should have weekday material');
     }
     assert.equal(result.dayOfWeek, 'tiistai');
   });
@@ -164,7 +164,7 @@ describe('Date resolution', () => {
   it('provides year cycle for the resolved date', () => {
     const result = resolveDate('2025-11-30');
     assert.ok(result.churchYear);
-    assert.equal(result.churchYear.yearCycle, 1); // 2025 → cycle 1
+    assert.equal(result.churchYear.yearCycle, 2); // 2025–2026 → 2. vuosikerta
   });
 
   it('resolves Pitkäperjantai', () => {
