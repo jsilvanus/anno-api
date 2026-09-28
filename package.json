@@ -7,8 +7,7 @@
   "workspaces": [
     "packages/core",
     "packages/api",
-    "packages/mcp",
-    "packages/kirkkovuosi-mcp"
+    "packages/mcp"
   ],
   "scripts": {
     "start": "npm start -w @anno-api/api",
@@ -16,9 +15,7 @@
     "start:mcp": "npm start -w @anno-api/mcp",
     "dev:mcp": "npm run dev -w @anno-api/mcp",
     "build": "npm run build --workspaces --if-present",
-    "test": "npm test --workspaces --if-present",
-    "start:kirkkovuosi-mcp": "npm start -w @anno-api/kirkkovuosi-mcp",
-    "dev:kirkkovuosi-mcp": "npm run dev -w @anno-api/kirkkovuosi-mcp"
+    "test": "npm test --workspaces --if-present"
   },
   "engines": {
     "node": ">=22.5"

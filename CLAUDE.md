@@ -13,7 +13,6 @@ npm run dev          # REST API with --watch
 npm test             # all packages
 npm run build        # compile packages/mcp (TypeScript)
 npm run start:mcp    # MCP server (needs packages/mcp/.env: MCP_PUBLIC_URL, JWT_SECRET)
-npm run start:kirkkovuosi-mcp  # kirkkovuosikalenteri.fi MCP server (packages/kirkkovuosi-mcp/.env)
 npm test -w @anno-api/core   # one package
 ```
 
@@ -43,9 +42,6 @@ packages/
     ├── src/mcp/server.ts   MCP tools.
     ├── src/oauth/          Embedded OAuth server: sign-in + registration page, consent, PKCE, tokens.
     └── src/app.ts          buildApp() for tests; src/server.ts reads the environment.
-└── kirkkovuosi-mcp/ @anno-api/kirkkovuosi-mcp  TypeScript MCP server wrapping the live kirkkovuosikalenteri.fi API
-    ├── src/connector.ts    KirkkovuosikalenteriConnector — fetch + HTML→text, in-memory cache.
-    └── src/mcp/server.ts   kvk_day, kvk_lectionary, kvk_liturgical_colors, kvk_search.
 ```
 
 ## Key design points
@@ -62,7 +58,7 @@ packages/
 
 ## kirkkovuosikalenteri.fi API
 
-`.claude/skills/kirkkovuosikalenteri-api/SKILL.md` documents the site's public API (day, colours, search) and its response fields. Keep it in step with `packages/kirkkovuosi-mcp/src/connector.ts` when either learns something new about the API.
+The MCP server that wraps the site's live API, and the AI instruction for the API (`.claude/skills/kirkkovuosikalenteri-api/SKILL.md`, every endpoint and response field), live in the sibling repository [jsilvanus/kirkkovuosi-mcp](https://github.com/jsilvanus/kirkkovuosi-mcp). `parsers/fetch-weekly-lectionary.js` here uses the same day endpoint; what one learns about the API belongs in that instruction too.
 
 ## Data files
 
