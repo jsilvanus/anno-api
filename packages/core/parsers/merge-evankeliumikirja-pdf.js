@@ -89,7 +89,7 @@ const crossRefCycle = ref => Number(ref?.match(/\(ks\. (\d)\. vuosikerta\)/)?.[1
 function mergeCycle(existing = {}, fromPdf = {}) {
   const out = { ...existing };
   for (const key of ['firstReading', 'secondReading', 'gospel']) {
-    const crossRef = crossRefCycle(existing[key]?.reference) ?? crossRefCycle(fromPdf[key]?.reference);
+    const crossRef = existing[key]?.sameAsYearCycle ?? crossRefCycle(existing[key]?.reference) ?? crossRefCycle(fromPdf[key]?.reference);
     out[key] = mergeReading(existing[key], fromPdf[key]);
     if (crossRef && out[key]) {
       out[key].reference = out[key].reference.replace(/\s*\(ks\.[^)]*\)/, '');
@@ -166,8 +166,9 @@ for (const day of days) {
     out.readings = null;
   } else if ((p.firstReading || p.secondReading || p.gospel) && !(p.reading || p.otReadings || p.ntReadings)) {
     // One set of texts for every year cycle
+    // The earlier parse stored these under weekdayTexts; later runs find them under readings.
     out.readings = mergeCycle(
-      { gospel: day.weekdayTexts?.gospel, firstReading: day.weekdayTexts?.readings?.[0] },
+      day.readings ?? { gospel: day.weekdayTexts?.gospel, firstReading: day.weekdayTexts?.readings?.[0] },
       p,
     );
     out.yearCycles = null;

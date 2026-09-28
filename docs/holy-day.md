@@ -1,6 +1,8 @@
 # GET /api/v1/holy-day/:slug
 
-Returns the complete raw data for a holy day by its slug identifier. Includes readings for all three year cycles.
+Returns a holy day by its slug in the same shape as a `Day` in the [day response](day-response.md): theme, colour, readings of a year cycle (`texts`) and of all cycles (`allYearCycles`), psalm, hallelujah verse, prayers, hymns and propers, plus its date in the church year.
+
+Query parameters: `?cycle=1|2|3` (default: the cycle of the church year), `?year=YYYY` (church year by its starting year; default: the current one), `?raw=true` (the unprocessed record from `all-days.json`, described below).
 
 ## Request
 
@@ -87,5 +89,5 @@ GET /api/v1/holy-day/joulupaiva
 
 ## Notes
 
-- This endpoint returns the unfiltered source data. Unlike `/api/v1/date/:date`, it does not resolve to a specific year cycle — all three cycles are returned under `yearCycles`.
+- With `?raw=true` the endpoint returns the unfiltered source data; all three cycles are under `yearCycles`, and days with one set of texts for every cycle have `readings` instead.
 - Slugs are stable identifiers suitable for bookmarking and cross-referencing.

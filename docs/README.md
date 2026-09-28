@@ -1,6 +1,8 @@
 # Kirkkovuosi API — Endpoint Documentation
 
-REST API for the liturgical calendar of the Evangelical-Lutheran Church of Finland. All endpoints are `GET`, return JSON, and require no authentication.
+REST API for the liturgical calendar of the Evangelical-Lutheran Church of Finland. All endpoints are `GET`, return JSON, and require no authentication. The same data is available to AI assistants through the [MCP server](mcp.md).
+
+The full structure of a resolved day is described in [day-response.md](day-response.md).
 
 Base URL: `http://localhost:3000`
 
@@ -16,7 +18,9 @@ Quick access to the current day's liturgical data without specifying a date.
 | `GET /api/v1/today/texts` | [today-texts.md](today-texts.md) | Bible readings for today (optionally a specific year cycle) |
 | `GET /api/v1/today/prayer` | [today-prayer.md](today-prayer.md) | Collect prayer for today (random or by number) |
 | `GET /api/v1/today/gospel` | [today-gospel.md](today-gospel.md) | Gospel reading for today |
-| `GET /api/v1/today/propers` | [today-propers.md](today-propers.md) | Liturgical propers for today: preface, Kyrie litany, psalm refrain |
+| `GET /api/v1/today/propers` | [today-propers.md](today-propers.md) | Liturgical propers and rubrics for today: preface, Kyrie litany, psalm refrain, post-communion prayer |
+| `GET /api/v1/today/color` | [date-color.md](date-color.md) | Liturgical colour for today |
+| `GET /api/v1/today/liturgy` | [liturgy.md](liturgy.md) | Seasonal rubrics (Gloria, Hallelujah, Gloria Patri) for today |
 
 ---
 
@@ -29,6 +33,10 @@ Look up any date from 1900 to 2100.
 | `GET /api/v1/date/:date` | [date.md](date.md) | Full church calendar info for a specific date (`YYYY-MM-DD`) |
 | `GET /api/v1/date/:date/color` | [date-color.md](date-color.md) | Liturgical color for a date |
 | `GET /api/v1/date/:date/propers` | [date-propers.md](date-propers.md) | Liturgical propers for a date |
+| `GET /api/v1/date/:date/texts` | [today-texts.md](today-texts.md) | Readings, psalm and hallelujah verse for a date (`?cycle=1\|2\|3`) |
+| `GET /api/v1/date/:date/prayer` | [today-prayer.md](today-prayer.md) | A prayer of the day for a date |
+| `GET /api/v1/date/:date/gospel` | [today-gospel.md](today-gospel.md) | Gospel for a date |
+| `GET /api/v1/date/:date/liturgy` | [liturgy.md](liturgy.md) | Seasonal rubrics for a date |
 
 ---
 
@@ -41,7 +49,8 @@ Browse and query the underlying holy day data.
 | `GET /api/v1/days` | [days.md](days.md) | Index of all holy days with name, slug, season, and color |
 | `GET /api/v1/holy-day/:slug` | [holy-day.md](holy-day.md) | Full data for a single holy day including readings for all three year cycles |
 | `GET /api/v1/year/:year/calendar` | [year-calendar.md](year-calendar.md) | Ordered list of all entries in a church year with computed dates |
-| `GET /api/v1/search/text?q=` | [search-text.md](search-text.md) | Search Sunday readings by Bible reference |
+| `GET /api/v1/search/text?q=` | [search-text.md](search-text.md) | Search readings (incl. alternatives) by Bible reference |
+| `GET /api/v1/periods` | [periods.md](periods.md) | Introductions of the periods of the church year |
 
 ---
 
@@ -55,6 +64,7 @@ Full collections of each proper type from Kirkkokäsikirja I.
 | `GET /api/v1/propers/kyrie-litaniat` | [propers-kyrie-litaniat.md](propers-kyrie-litaniat.md) | All seasonal Kyrie litanies |
 | `GET /api/v1/propers/synninpaastot` | [propers-synninpaastot.md](propers-synninpaastot.md) | All absolution texts |
 | `GET /api/v1/propers/kiitosrukoukset` | [propers-kiitosrukoukset.md](propers-kiitosrukoukset.md) | All thanksgiving prayers after absolution |
+| `GET /api/v1/propers/kiitosrukoukset-ehtoollinen` | [propers-kiitosrukoukset-ehtoollinen.md](propers-kiitosrukoukset-ehtoollinen.md) | Seasonal thanksgiving prayers after communion |
 | `GET /api/v1/propers/kertosaakeet` | [propers-kertosaakeet.md](propers-kertosaakeet.md) | All seasonal psalm refrains |
 | `GET /api/v1/propers/improperia` | [propers-improperia.md](propers-improperia.md) | Good Friday Improperia texts |
 
@@ -81,7 +91,11 @@ The Finnish Lutheran church year begins on the **1st Advent Sunday** (nearest Su
 
 ### Three-year lectionary cycle
 
-Sunday readings rotate through three cycles (vuosikerta 1, 2, 3). The active cycle changes each 1st Advent Sunday. The API resolves the correct cycle for any given date.
+Sunday readings rotate through three cycles (vuosikerta 1, 2, 3). The active cycle changes each 1st Advent Sunday: 2024–2025 was the 1st, 2025–2026 is the 2nd and 2026–2027 the 3rd. The API resolves the correct cycle for any given date.
+
+### Verified against the official calendars
+
+The generated calendar is tested against the ELCF's published *perikooppikalenterit* for church years 2021–2029: every date, name, reading, psalm and hallelujah verse must match.
 
 ### Propers vs. readings
 
@@ -103,6 +117,7 @@ Sunday readings rotate through three cycles (vuosikerta 1, 2, 3). The active cyc
 | Data | Source |
 |---|---|
 | Lectionary readings | Evankeliumikirja (Kirkkokäsikirja II, 2021) |
+| Dated calendars (test ground truth) | Perikooppikalenterit 2021–2029 (evl.fi) |
 | Liturgical propers | Jumalanpalvelusten kirja (Kirkkokäsikirja I, 2000) |
 | Lectionary Bible index | Viikkolektionaarin raamatunkohdat (PDF) |
 | Easter computation | Anonymous Gregorian algorithm (Meeus/Jones/Butcher) |

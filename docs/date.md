@@ -40,14 +40,14 @@ GET /api/v1/date/2025-12-25
   "churchYear": {
     "start": 2025,
     "label": "2025–2026",
-    "yearCycle": 1
+    "yearCycle": 2
   },
   "holyDay": {
     "name": "Joulupäivä",
     "slug": "joulupaiva",
     "liturgicalColor": "valkoinen",
     "texts": {
-      "yearCycle": 1,
+      "yearCycle": 2,
       "firstReading": { "reference": "Jes. 52:7–10", "text": "..." },
       "secondReading": { "reference": "Hepr. 1:1–4", "text": "..." },
       "gospel": { "reference": "Joh. 1:1–14", "text": "..." }
