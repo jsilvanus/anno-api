@@ -38,6 +38,16 @@ Look up any date from 1900 to 2100.
 | `GET /api/v1/date/:date/gospel` | [today-gospel.md](today-gospel.md) | Gospel for a date |
 | `GET /api/v1/date/:date/liturgy` | [liturgy.md](liturgy.md) | Seasonal rubrics for a date |
 
+### Several days on one date
+
+Several days can fall on one date: 4. adventtisunnuntai, jouluaatto and jouluyö on a Sunday 24.12; pitkäperjantai, Jeesuksen kuolinhetki and pitkäperjantain ilta; hiljainen lauantai and pääsiäisyö; a Sunday and a prayer day. The full-day responses (`/today`, `/date/:date`) return all of them: `holyDay` plus `additionalServices`, each complete.
+
+The per-date views (`texts`, `prayer`, `gospel`, `propers`, `color`, `liturgy`, under both `/today/` and `/date/:date/`) are about one day at a time:
+
+- without parameters they use the primary day (the first one listed in the official calendar, or on a weekday the day whose material is used)
+- `?day=<slug>` picks another one, e.g. `/api/v1/date/2026-04-04/liturgy?day=paasiaisyo`; a slug that is not on the date answers 404 with the ones that are
+- every response has `day` (`name`, `slug`, `type`) and `alsoOnThisDate`, the other days on the date
+
 ---
 
 ## Holy Days & Calendar Structure

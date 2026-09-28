@@ -24,15 +24,46 @@ function resolveOptions(query) {
   return { allYearCycles: query.cycles !== 'false' };
 }
 
-/** The day whose material is used: the holy day, or on a weekday the Sunday's. */
-function dayOf(resolved) {
-  return resolved.holyDay || resolved.weekdayMaterial;
-}
-
 function parseCycle(value) {
   if (value === undefined) return null;
   const cycle = Number(value);
   return [1, 2, 3].includes(cycle) ? cycle : undefined;
+}
+
+const summary = d => ({ name: d.name, slug: d.slug, type: d.type });
+
+/**
+ * Pick the day a per-date view is about.
+ *
+ * Several days can fall on one date (4. adventtisunnuntai + jouluaatto +
+ * jouluyö, pitkäperjantai + Jeesuksen kuolinhetki, hiljainen lauantai +
+ * pääsiäisyö, …). Without `?day=` the primary day is used — the holy day,
+ * or on a weekday the day whose material is used; `?day=<slug>` picks any
+ * of them. `alsoOnThisDate` lists the others.
+ */
+function selectDay(date, query) {
+  const resolved = resolveDate(date, { allYearCycles: false });
+  const all = [resolved.holyDay, ...resolved.additionalServices, resolved.weekdayMaterial].filter(Boolean);
+  let day = all[0] ?? null;
+  if (query.day) {
+    day = all.find(d => d.slug === query.day) ?? null;
+    if (!day) {
+      return {
+        error: `No day "${query.day}" on ${date}. Days on this date: ${all.map(d => d.slug).join(', ') || 'none'}.`,
+        status: 404,
+      };
+    }
+  }
+  return {
+    resolved,
+    day,
+    header: {
+      date,
+      holyDay: day?.name ?? null,
+      day: day ? summary(day) : null,
+      alsoOnThisDate: all.filter(d => d !== day).map(summary),
+    },
+  };
 }
 
 // ─── Per-date views (shared by /today/* and /date/:date/*) ─────────────────
@@ -40,72 +71,65 @@ function parseCycle(value) {
 function textsView(date, query) {
   const cycle = parseCycle(query.cycle);
   if (cycle === undefined) return { error: 'Invalid cycle. Use 1, 2 or 3.' };
-  const resolved = resolveDate(date);
-  const day = dayOf(resolved);
-  const yearCycle = cycle ?? resolved.churchYear.yearCycle;
+  const picked = selectDay(date, query);
+  if (picked.error) return picked;
+  const { resolved, day, header } = picked;
   let texts = day?.texts ?? null;
-  if (cycle && day) texts = getHolyDay(day.slug, { yearCycle: cycle, churchYear: resolved.churchYear.start }).texts;
+  if (cycle && day) {
+    texts = getHolyDay(day.materialFrom ?? day.slug, { yearCycle: cycle, churchYear: resolved.churchYear.start })?.texts ?? texts;
+  }
   return {
-    date,
-    holyDay: resolved.holyDay?.name ?? null,
-    materialFrom: resolved.holyDay ? null : day?.name ?? null,
-    yearCycle,
+    ...header,
+    materialFrom: day && !resolved.holyDay ? day.name : null,
+    yearCycle: cycle ?? resolved.churchYear.yearCycle,
     texts,
     psalm: day?.psalm ?? null,
     hallelujah: day?.hallelujah ?? null,
-    liturgy: day?.liturgy ?? resolved.liturgy,
     psalmVerse: day?.psalmVerse ?? null,
+    liturgy: day?.liturgy ?? resolved.liturgy,
   };
 }
 
 function prayerView(date, query) {
-  const resolved = resolveDate(date, { allYearCycles: false });
-  const day = dayOf(resolved);
-  if (!day?.prayers?.length) return { date, holyDay: day?.name ?? null, prayer: null };
+  const picked = selectDay(date, query);
+  if (picked.error) return picked;
+  const { day, header } = picked;
+  if (!day?.prayers?.length) return { ...header, prayer: null };
   const n = query.n ? parseInt(query.n, 10) : null;
   if (n && n >= 1 && n <= day.prayers.length) {
-    return { date, holyDay: day.name, prayer: day.prayers[n - 1], totalPrayers: day.prayers.length };
+    return { ...header, prayer: day.prayers[n - 1], totalPrayers: day.prayers.length };
   }
-  if (query.all === 'true') return { date, holyDay: day.name, prayers: day.prayers };
+  if (query.all === 'true') return { ...header, prayers: day.prayers };
   const prayer = day.prayers[Math.floor(Math.random() * day.prayers.length)];
-  return { date, holyDay: day.name, prayer, totalPrayers: day.prayers.length };
+  return { ...header, prayer, totalPrayers: day.prayers.length };
 }
 
-function gospelView(date) {
-  const resolved = resolveDate(date, { allYearCycles: false });
-  const day = dayOf(resolved);
-  return {
-    date,
-    holyDay: day?.name ?? null,
-    yearCycle: resolved.churchYear.yearCycle,
-    gospel: day?.texts?.gospel ?? null,
-  };
+function gospelView(date, query) {
+  const picked = selectDay(date, query);
+  if (picked.error) return picked;
+  const { resolved, day, header } = picked;
+  return { ...header, yearCycle: resolved.churchYear.yearCycle, gospel: day?.texts?.gospel ?? null };
 }
 
-function propersView(date) {
-  const resolved = resolveDate(date, { allYearCycles: false });
-  const day = dayOf(resolved);
-  return {
-    date,
-    holyDay: day?.name ?? null,
-    propers: day?.propers ?? null,
-    liturgy: resolved.liturgy,
-  };
+function propersView(date, query) {
+  const picked = selectDay(date, query);
+  if (picked.error) return picked;
+  const { resolved, day, header } = picked;
+  return { ...header, propers: day?.propers ?? null, liturgy: day?.liturgy ?? resolved.liturgy };
 }
 
-function colorView(date) {
-  const resolved = resolveDate(date, { allYearCycles: false });
-  return {
-    date,
-    holyDay: dayOf(resolved)?.name ?? null,
-    liturgicalColor: resolved.liturgicalColor?.color ?? null,
-    color: resolved.liturgicalColor,
-  };
+function colorView(date, query) {
+  const picked = selectDay(date, query);
+  if (picked.error) return picked;
+  const { day, header } = picked;
+  return { ...header, liturgicalColor: day?.liturgicalColor?.color ?? null, color: day?.liturgicalColor ?? null };
 }
 
-function liturgyView(date) {
-  const resolved = resolveDate(date, { allYearCycles: false });
-  return { date, holyDay: dayOf(resolved)?.name ?? null, liturgy: resolved.liturgy };
+function liturgyView(date, query) {
+  const picked = selectDay(date, query);
+  if (picked.error) return picked;
+  const { resolved, day, header } = picked;
+  return { ...header, liturgy: day?.liturgy ?? resolved.liturgy };
 }
 
 const DATE_VIEWS = {
