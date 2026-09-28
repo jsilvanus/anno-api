@@ -1,66 +1,24 @@
-# GET /api/v1/today/prayer
+# GET /api/v1/today/prayer · GET /api/v1/date/:date/prayer
 
-Returns a collect prayer for today's holy day (or preceding Sunday on weekdays).
+A prayer of the day (päivän rukous).
 
-## Request
+## Parameters
 
-```
-GET /api/v1/today/prayer
-GET /api/v1/today/prayer?n=2
-```
+| Parameter | Description |
+|---|---|
+| `?day=<slug>` | Another day or service on the date (see [Several days on one date](README.md#several-days-on-one-date)); 404 if not on the date |
+| `?n=2` | A specific prayer by number |
+| `?all=true` | All prayers of the day |
 
-### Query parameters
+Without `?day=`, the primary day is used: the date's holy day, or on a weekday the day whose material is used.
 
-| Parameter | Type | Description |
-|---|---|---|
-| `n` | number (optional) | Return a specific prayer by number (1-based). Omit for a random prayer. |
-
-## Response fields
+## Response
 
 | Field | Type | Description |
 |---|---|---|
-| `date` | string | Today's date |
-| `holyDay` | string | Name of the holy day the prayer belongs to |
-| `prayer` | object\|null | The prayer, or `null` if none available |
-| `prayer.number` | number | Prayer number within the day |
-| `prayer.text` | string | Full prayer text in Finnish |
-| `totalPrayers` | number | Total number of prayers available (only when returning a random one) |
-
-## Example
-
-```
-GET /api/v1/today/prayer
-```
-
-```json
-{
-  "date": "2025-12-25",
-  "holyDay": "Joulupäivä",
-  "prayer": {
-    "number": 2,
-    "text": "Kaikkivaltias Jumala,\nsinä olet lähettänyt Poikasi maailmaan\npelastamaan meidät synnistä ja kuolemasta..."
-  },
-  "totalPrayers": 3
-}
-```
-
-```
-GET /api/v1/today/prayer?n=1
-```
-
-```json
-{
-  "date": "2025-12-25",
-  "holyDay": "Joulupäivä",
-  "prayer": {
-    "number": 1,
-    "text": "Kaikkivaltias, ikuinen Jumala.\nSinä annoit ainoan Poikasi syntyä ihmiseksi..."
-  }
-}
-```
-
-## Notes
-
-- Most holy days have 3 prayer options. The `?n=` parameter selects one deterministically; without it the selection is random.
-- On a weekday with no holy day, the preceding Sunday's prayers are used.
-- If no prayers are available, `prayer` is `null`.
+| `date` | string | `YYYY-MM-DD` |
+| `day` | object\|null | `{ name, slug, type }` of the day this response is about |
+| `alsoOnThisDate` | array | The other days and services on the date, `{ name, slug, type }` |
+| `prayer` | object\|null | `{ number, text }` — random unless `?n=` is given |
+| `totalPrayers` | number | Number of prayers of the day |
+| `prayers` | array | With `?all=true`: all prayers |

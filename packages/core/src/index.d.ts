@@ -85,9 +85,50 @@ export interface Day {
   prayers: { number: number; text: string }[];
   hymns: Record<string, { number: string; title: string }[]> | null;
   propers: Propers;
-  weeklyLectionary: unknown[];
+  /** Number of altar candles, e.g. "Kaksi alttarikynttilää". */
+  altarCandles: string | null;
+  /** Prayer-hour texts of this day on this weekday (viikkolektionaari). */
+  dailyLectionary?: DailyLectionary | null;
   /** Rubrics of this day or service (null for an undated holy day lookup). */
   liturgy?: Liturgy | null;
+}
+
+export interface Passage {
+  reference: string;
+  text: string | null;
+  /** Psalm text with cadence marks: "*" pause, "_x_" syllable where the cadence starts. */
+  chant?: string;
+}
+
+export interface PrayerHour {
+  readings: Passage[];
+  psalms: Passage[];
+}
+
+/** An evening prayer that is a Sunday's or feast's vespers. */
+export interface Vespers extends PrayerHour {
+  /** 'first': the evening before the day (aattoilta); 'second': the day's own evening. */
+  vespers?: 'first' | 'second';
+  /** The Sunday or feast whose vespers these are. */
+  of?: { date: string; slug: string; name: string };
+}
+
+export interface DailyLectionary {
+  /** This Sunday's or feast's first vespers (aattoilta), prayed the evening before. */
+  firstVespers: PrayerHour | null;
+  morning: PrayerHour | null;
+  noon: PrayerHour | null;
+  /** The evening prayer of this date. The evening before a Sunday or feast is its
+   *  first vespers (Saturday has no vespers of its own); a Sunday's or feast's own
+   *  evening is its second vespers. */
+  evening: Vespers | null;
+  /** When a feast keeps its own second vespers on the evening before another
+   *  Sunday or feast (pyhäinpäivä on a Saturday), or an extra service on the eve:
+   *  the next day's first vespers. */
+  nextDayFirstVespers?: Vespers;
+  dayPsalm: Passage[];
+  weekPsalm: Passage[];
+  apocrypha: Passage[];
 }
 
 export interface ChurchYear {
@@ -108,7 +149,6 @@ export interface ResolvedDate {
   holyDay: Day | null;
   additionalServices: Day[];
   weekdayMaterial: Day | null;
-  precedingSunday: { name: string; slug: string; date: string | null } | null;
   liturgicalColor: LiturgicalColor | null;
   liturgy: Liturgy;
 }
@@ -152,7 +192,6 @@ export function getDayData(slug: string): RawDay | null;
 export function getAllDays(): RawDay[];
 export function getPeriods(): { name: string; season: string; description: string }[];
 export function getChurchYearCalendar(startYear: number): { churchYear: ChurchYear; entries: CalendarEntry[] };
-export function getSeasonEntries(startYear: number, season: string): unknown;
 
 export function easterSunday(year: number): Date;
 export function makeDate(year: number, month: number, day: number): Date;
@@ -193,4 +232,7 @@ export function parseLiturgicalColor(text: string | null | undefined): unknown;
 export function colorForDay(text: string | null | undefined, options?: { weekday?: boolean }): LiturgicalColor | null;
 export function liturgicalRules(date: Date, calendar: unknown[], day: unknown): Liturgy;
 export function searchReadings(query: string): ReadingSearchResult[];
+export function dailyLectionary(slug: string, weekday: number): DailyLectionary | null;
+export function altarCandles(slug: string): string | null;
+export function weeklyLectionaryMeta(): { source: string; fetched: string };
 export function todayInFinland(now?: Date): string;

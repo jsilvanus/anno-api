@@ -1,65 +1,24 @@
-# GET /api/v1/date/:date/color
+# GET /api/v1/today/color · GET /api/v1/date/:date/color
 
-Returns only the liturgical color for a specific date. Lightweight alternative to the full date endpoint.
+The liturgical colour of the day. On weekdays after a feast that took a Sunday's place, this is the weekday colour (e.g. green from Monday after kynttilänpäivä).
 
-## Request
+## Parameters
 
-```
-GET /api/v1/date/:date/color
-```
+| Parameter | Description |
+|---|---|
+| `?day=<slug>` | Another day or service on the date (see [Several days on one date](README.md#several-days-on-one-date)); 404 if not on the date |
 
-### Path parameters
+Without `?day=`, the primary day is used: the date's holy day, or on a weekday the day whose material is used.
 
-| Parameter | Type | Description |
-|---|---|---|
-| `date` | string | Date in `YYYY-MM-DD` format |
-
-## Response fields
+## Response
 
 | Field | Type | Description |
 |---|---|---|
-| `date` | string | The requested date |
-| `liturgicalColor` | string\|null | Finnish name of the liturgical color |
-| `holyDay` | string\|null | Name of the holy day or preceding Sunday governing the color |
-
-## Example
-
-```
-GET /api/v1/date/2025-12-25/color
-```
-
-```json
-{
-  "date": "2025-12-25",
-  "liturgicalColor": "valkoinen",
-  "holyDay": "Joulupäivä"
-}
-```
-
-```
-GET /api/v1/date/2026-04-03/color
-```
-
-```json
-{
-  "date": "2026-04-03",
-  "liturgicalColor": "musta tai violetti",
-  "holyDay": "Pitkäperjantai"
-}
-```
-
-## Common colors
-
-| Finnish | English |
-|---|---|
-| `valkoinen` | white |
-| `violetti tai sininen` | violet or blue |
-| `vihreä` | green |
-| `punainen` | red |
-| `musta tai violetti` | black or violet |
-
-## Error
-
-```json
-{ "error": "Invalid date format. Use YYYY-MM-DD." }
-```
+| `date` | string | `YYYY-MM-DD` |
+| `day` | object\|null | `{ name, slug, type }` of the day this response is about |
+| `alsoOnThisDate` | array | The other days and services on the date, `{ name, slug, type }` |
+| `liturgicalColor.color` | string | `valkoinen`, `violetti`, `sininen`, `vihreä`, `punainen` or `musta` |
+| `liturgicalColor.alternatives` | string[] | Alternative colours ("violetti tai sininen") |
+| `liturgicalColor.english` | string[] | The same in English |
+| `liturgicalColor.note` | string\|null | Conditions from Evankeliumikirja |
+| `liturgicalColor.text` | string | The colour text as given in the book |

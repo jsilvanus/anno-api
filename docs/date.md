@@ -23,7 +23,7 @@ Same shape as [`GET /api/v1/today`](today.md) but for the given date.
 | `date` | string | The requested date |
 | `churchYear` | object | Church year info: `start`, `label`, `yearCycle` |
 | `holyDay` | object\|null | Primary holy day, or `null` on plain weekdays |
-| `precedingSunday` | object\|null | On weekdays: enriched preceding Sunday data |
+| `weekdayMaterial` | object\|null | On weekdays without a holy day: the day whose material is used |
 | `additionalServices` | array | Lower-priority entries sharing the date |
 | `dayOfWeek` | string | Finnish day name |
 | `season` | string\|null | Liturgical season |
@@ -45,7 +45,7 @@ GET /api/v1/date/2025-12-25
   "holyDay": {
     "name": "Joulupäivä",
     "slug": "joulupaiva",
-    "liturgicalColor": "valkoinen",
+    "liturgicalColor": { "color": "valkoinen", "alternatives": [], "english": ["white"], "note": null, "text": "valkoinen" },
     "texts": {
       "yearCycle": 2,
       "firstReading": { "reference": "Jes. 52:7–10", "text": "..." },
@@ -55,7 +55,6 @@ GET /api/v1/date/2025-12-25
     "prayers": ["..."],
     "propers": { "prefaatio": {...}, "kyrieLitania": {...}, "kertosae": {...} }
   },
-  "precedingSunday": null,
   "additionalServices": [],
   "dayOfWeek": "torstai",
   "season": "Joulujakso"

@@ -31,7 +31,7 @@ GET /api/v1/today
   "holyDay": {
     "name": "Joulupäivä",
     "slug": "joulupaiva",
-    "liturgicalColor": "valkoinen",
+    "liturgicalColor": { "color": "valkoinen", "alternatives": [], "english": ["white"], "note": null, "text": "valkoinen" },
     "description": "...",
     "texts": {
       "yearCycle": 2,
@@ -60,7 +60,6 @@ GET /api/v1/today
       "kertosae": { "number": 7, "title": "...", "occasion": "..." }
     }
   },
-  "precedingSunday": null,
   "additionalServices": [],
   "dayOfWeek": "torstai",
   "season": "Joulujakso"
@@ -69,6 +68,6 @@ GET /api/v1/today
 
 ## Notes
 
-- On a plain weekday with no holy day, `holyDay` is `null` and `precedingSunday` is populated with the enriched data of the preceding Sunday — allowing callers to use its texts and propers for weekday services.
+- On a weekday without its own holy day, `holyDay` is `null` and `weekdayMaterial` holds the day whose texts, prayers and colour are used.
 - `additionalServices` lists lower-priority entries that share the date (e.g. an evening vigil alongside a feast day).
 - See [today-texts.md](today-texts.md), [today-prayer.md](today-prayer.md), [today-gospel.md](today-gospel.md), [today-propers.md](today-propers.md) for focused sub-endpoints.

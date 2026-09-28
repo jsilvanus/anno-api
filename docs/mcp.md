@@ -9,6 +9,7 @@ All tools are read-only.
 | Tool | Arguments | Returns |
 |---|---|---|
 | `church_day` | `date?`, `include_texts?` | The [day response](day-response.md) for a date (default: today in Finland). `include_texts: false` returns references only. |
+| `daily_lectionary` | `date?` | The weekly lectionary for a date with full texts: morning, midday and evening prayer, day's psalm, first and second vespers, week's psalm and apocrypha, for every day and service on the date |
 | `holy_day` | `name`, `year_cycle?`, `church_year?`, `include_texts?` | One holy day by slug or Finnish/Latin name ("Laetare", "mikkelinpäivä") |
 | `upcoming_holy_days` | `from?`, `count?` | The next Sundays, feasts and services |
 | `church_year_calendar` | `start_year?` | Every dated day of a church year |

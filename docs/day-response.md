@@ -14,7 +14,6 @@
 | `holyDay` | Day \| null | The date's own holy day, or `null` on a plain weekday |
 | `additionalServices` | Day[] | Other days on the date: services (jouluyö, pääsiäisyö, Jeesuksen kuolinhetki), a Sunday that coincides with a feast, and observances (rukouspäivät, Pyhän Henrikin muistopäivä) |
 | `weekdayMaterial` | Day \| null | On a weekday without its own holy day: the day whose texts, prayers and colour are used |
-| `precedingSunday` | object \| null | `{ name, slug, date }` of `weekdayMaterial` (kept for compatibility) |
 | `liturgicalColor` | Color | Colour of the day (see below) |
 | `liturgy` | object | Seasonal rubrics of the Mass (see below) |
 
@@ -35,7 +34,7 @@ Weekdays use the material of the week's Sunday ("Arkipäivinä käytetään … 
 |---|---|---|
 | `name`, `slug` | string | Finnish name and identifier |
 | `date` | string \| null | Date in the church year |
-| `type` | string | `sunday`, `feast`, `day`, `service`, `observance`, `weekday`, `weekdayMaterial` |
+| `type` | string | `sunday`, `feast`, `day`, `service`, `observance`, `weekday`, or `weekdayMaterial` on a weekday using another day's material |
 | `theme` | string \| null | Theme of the day, e.g. `"Kuninkaasi tulee nöyränä"` |
 | `latinName` | string \| null | e.g. `Laetare`, `Rogate` |
 | `alternativeName` | string \| null | e.g. `"3. joulupäivä"`, `"Enkelien sunnuntai"` |
@@ -43,6 +42,7 @@ Weekdays use the material of the week's Sunday ("Arkipäivinä käytetään … 
 | `description` | string | Introduction from Evankeliumikirja |
 | `liturgicalColor` | Color | Colour of the day (on weekday material: the weekday colour) |
 | `replaces` | string \| null | Slug of the Sunday whose place the feast takes |
+| `altarCandles` | string \| null | Number of altar candles, e.g. "Kaksi alttarikynttilää" (Kirkkovuosikalenteri) |
 | `materialFrom` | string | Only for 6. sunnuntai loppiaisesta: its texts come from 26. sunnuntai helluntaista |
 | `texts` | Texts | Readings of the active year cycle |
 | `allYearCycles` | object | Readings of all three cycles (days with cycles; omitted with `?cycles=false`) |
@@ -52,7 +52,7 @@ Weekdays use the material of the week's Sunday ("Arkipäivinä käytetään … 
 | `prayers` | array | `{ number, text }` — päivän rukoukset |
 | `hymns` | object | `opening`, `dayHymns`, `additional`, `other` — `{ number, title }` |
 | `propers` | object | `prefaatio`, `kyrieLitania`, `kertosae`, `postCommunionPrayer` (kiitosrukous ehtoollisen jälkeen); `null` where the book gives no seasonal text |
-| `weeklyLectionary` | array | Viikkolektionaari entries listed for this day (evening before, psalms, …) |
+| `dailyLectionary` | object \| null | The prayer-hour texts of this day on this weekday: morning, midday and evening prayer, day's psalm, and on Sundays and holy days the first vespers, week's psalm and apocrypha. The evening is the next day's first vespers on the evening before a Sunday or feast (Saturday has no vespers of its own), and the day's second vespers on a Sunday or feast. See [daily-lectionary.md](daily-lectionary.md) |
 
 ### Texts
 

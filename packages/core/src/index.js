@@ -12,7 +12,7 @@ export {
   ENTRY_TYPES,
 } from './computus.js';
 export {
-  resolveDate, getHolyDay, getDayData, getAllDays, getPeriods, getChurchYearCalendar, getSeasonEntries,
+  resolveDate, getHolyDay, getDayData, getAllDays, getPeriods, getChurchYearCalendar,
 } from './resolver.js';
 export {
   getPropers, getSeasonKeys, getPrefaatio, getKyrieLitania, getKertosae, getPostCommunionPrayer,
@@ -23,6 +23,7 @@ export { getIndexMeta, getByHolyDay, searchByReference, getHolyDayNames, getAllE
 export { parseLiturgicalColor, colorForDay, COLORS } from './colors.js';
 export { liturgicalRules } from './rules.js';
 export { searchReadings } from './search.js';
+export { dailyLectionary, altarCandles, weeklyLectionaryMeta } from './weekly-lectionary.js';
 
 /** Today's date (YYYY-MM-DD) in Finland, where the church year is kept. */
 export function todayInFinland(now = new Date()) {

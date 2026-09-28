@@ -90,7 +90,8 @@ describe('REST API', () => {
     assert.equal(night.body.day.slug, 'jouluyo');
     assert.match(night.body.gospel.reference, /^Luuk\. 2:1/);
     const color = await get('/api/v1/date/2023-12-24/color?day=jouluaatto');
-    assert.equal(color.body.liturgicalColor, 'valkoinen');
+    assert.equal(color.body.liturgicalColor.color, 'valkoinen');
+    assert.equal(color.body.holyDay, undefined);
   });
 
   it('answers 404 for a day that is not on the date', async () => {

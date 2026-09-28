@@ -2,7 +2,7 @@
 
 The church year of the Evangelical-Lutheran Church of Finland as a REST API and an MCP server.
 
-For any date: the holy day (or, on a weekday, the Sunday whose material is used), season and period, year cycle, the readings of the three-year lectionary with full texts, psalm, hallelujah verse or Lent psalm verse, prayers, hymns, liturgical colour, propers (preface, Kyrie litany, psalm refrain, post-communion prayer) and the seasonal rubrics of the Mass.
+For any date: the holy day (or, on a weekday, the Sunday whose material is used), season and period, year cycle, the readings of the three-year lectionary with full texts, psalm, hallelujah verse or Lent psalm verse, prayers, hymns, liturgical colour and altar candles, propers (preface, Kyrie litany, psalm refrain, post-communion prayer), the seasonal rubrics of the Mass, and the weekly lectionary's prayer-hour texts for every day.
 
 Sources: Evankeliumikirja (2021), Jumalanpalvelusten kirja (2000) and the weekly lectionary index. The generated calendar is tested against the ELCF's official *perikooppikalenterit* for church years 2021–2029.
 
@@ -13,6 +13,8 @@ Sources: Evankeliumikirja (2021), Jumalanpalvelusten kirja (2000) and the weekly
 | [`packages/core`](packages/core) — `@anno-api/core` | Calendar computation, date resolution and the data. Zero dependencies. |
 | [`packages/api`](packages/api) — `@anno-api/api` | REST API, zero-dependency HTTP server. [Endpoints](docs/README.md) |
 | [`packages/mcp`](packages/mcp) — `@anno-api/mcp` | MCP server (Streamable HTTP) with an embedded OAuth server; sign-in and registration on the OAuth page. [Tools](docs/mcp.md) |
+
+An MCP server that answers live from kirkkovuosikalenteri.fi (Finnish and Swedish), and an instruction for an AI to use the site's public API directly, are in [jsilvanus/kirkkovuosi-mcp](https://github.com/jsilvanus/kirkkovuosi-mcp).
 
 ## Quick start
 
@@ -42,6 +44,7 @@ All responses are JSON; no authentication.
 | `GET /api/v1/{today,date/:date}/propers` | Propers and rubrics |
 | `GET /api/v1/{today,date/:date}/color` | Liturgical colour |
 | `GET /api/v1/{today,date/:date}/liturgy` | Rubrics: Gloria, Hallelujah, Gloria Patri |
+| `GET /api/v1/{today,date/:date}/lectionary` | Weekly lectionary: morning, midday and evening prayer texts |
 | `GET /api/v1/holy-day/:slug` | One holy day (`?cycle=`, `?year=`, `?raw=true`) |
 | `GET /api/v1/year/:year/calendar` | Church year starting at Advent of `:year` |
 | `GET /api/v1/days` | All holy days |
@@ -54,7 +57,7 @@ The response structure is documented in [docs/day-response.md](docs/day-response
 
 ## MCP server
 
-Connect an MCP client to `https://<your host>/mcp`. On first use the client opens the server's OAuth page, where the user signs in or creates an account. Tools: `church_day`, `holy_day`, `upcoming_holy_days`, `church_year_calendar`, `list_holy_days`, `church_year_periods`, `search_bible_reference`, `liturgical_texts`. See [docs/mcp.md](docs/mcp.md).
+Connect an MCP client to `https://<your host>/mcp`. On first use the client opens the server's OAuth page, where the user signs in or creates an account. Tools: `church_day`, `daily_lectionary`, `holy_day`, `upcoming_holy_days`, `church_year_calendar`, `list_holy_days`, `church_year_periods`, `search_bible_reference`, `liturgical_texts`. See [docs/mcp.md](docs/mcp.md).
 
 ## Project structure
 
@@ -84,5 +87,6 @@ anno-api/
 | Readings, psalms, prayers, hymns, colours | Evankeliumikirja (Kirkkokäsikirja II, uudistettu painos 2021) |
 | Propers and rubrics | Jumalanpalvelusten kirja (Kirkkokäsikirja I, 2000) |
 | Weekly lectionary index | Viikkolektionaarin raamatunkohdat |
+| Weekly lectionary texts, altar candles | Kirkkovuosikalenteri (kirkkovuosikalenteri.fi), © Kirkkohallitus |
 | Dated calendars (test ground truth) | Perikooppikalenterit 2021–2029, evl.fi |
 | Easter | Anonymous Gregorian algorithm (Meeus/Jones/Butcher) |

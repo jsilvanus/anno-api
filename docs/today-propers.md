@@ -1,66 +1,24 @@
-# GET /api/v1/today/propers
+# GET /api/v1/today/propers · GET /api/v1/date/:date/propers
 
-Returns the liturgical propers for today from the Jumalanpalvelusten kirja (2000).
+Liturgical propers of the day from Jumalanpalvelusten kirja, with the day's rubrics.
 
-## Request
+## Parameters
 
-```
-GET /api/v1/today/propers
-```
+| Parameter | Description |
+|---|---|
+| `?day=<slug>` | Another day or service on the date (see [Several days on one date](README.md#several-days-on-one-date)); 404 if not on the date |
 
-No parameters.
+Without `?day=`, the primary day is used: the date's holy day, or on a weekday the day whose material is used.
 
-## Response fields
+## Response
 
 | Field | Type | Description |
 |---|---|---|
-| `date` | string | Today's date |
-| `holyDay` | string\|null | Name of the holy day |
-| `propers` | object\|null | The propers object |
-| `propers.prefaatio` | object\|null | Seasonal preface ending |
-| `propers.prefaatio.title` | string | Descriptive title |
-| `propers.prefaatio.period` | string | Season this preface applies to |
-| `propers.prefaatio.text` | string | Full preface text |
+| `date` | string | `YYYY-MM-DD` |
+| `day` | object\|null | `{ name, slug, type }` of the day this response is about |
+| `alsoOnThisDate` | array | The other days and services on the date, `{ name, slug, type }` |
+| `propers.prefaatio` | object\|null | Preface ending of the season |
 | `propers.kyrieLitania` | object\|null | Seasonal Kyrie litany |
-| `propers.kyrieLitania.season` | string | Season name |
-| `propers.kyrieLitania.texts` | array | Litany text(s) |
-| `propers.kertosae` | object\|null | Psalm refrain for the day |
-| `propers.kertosae.number` | number | Refrain number |
-| `propers.kertosae.title` | string | Refrain title |
-| `propers.kertosae.occasion` | string | Liturgical occasion description |
-
-## Example
-
-```
-GET /api/v1/today/propers
-```
-
-```json
-{
-  "date": "2025-12-25",
-  "holyDay": "Joulupäivä",
-  "propers": {
-    "prefaatio": {
-      "title": "Prefaation päätös jouluaikana",
-      "period": "jouluaikana",
-      "text": "Hän on Sana, joka on tullut lihaksi\n\nja asunut meidän keskellämme..."
-    },
-    "kyrieLitania": {
-      "season": "Joulu – jouluaika",
-      "slug": "joulu-jouluaika",
-      "texts": ["Jouluaattona, jouluyönä ja joulupäivänä.\n\nE Rukoilkaamme syntynyttä Vapahtajaa..."]
-    },
-    "kertosae": {
-      "number": 7,
-      "title": "Meille on syntynyt Vapahtaja",
-      "occasion": "Jouluyönä, jouluaamuna, joulupäivänä"
-    }
-  }
-}
-```
-
-## Notes
-
-- Propers are drawn from Kirkkokäsikirja I (Jumalanpalvelusten kirja, 2000).
-- For full collections of each proper type, see the `/api/v1/propers/*` endpoints.
-- On weekdays, propers from the preceding Sunday are used.
+| `propers.kertosae` | object\|null | Psalm refrain |
+| `propers.postCommunionPrayer` | object\|null | Thanksgiving prayer after communion |
+| `liturgy` | object | Rubrics of this day (see [day-response.md](day-response.md#liturgy)) |

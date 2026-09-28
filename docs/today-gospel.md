@@ -1,47 +1,21 @@
-# GET /api/v1/today/gospel
+# GET /api/v1/today/gospel · GET /api/v1/date/:date/gospel
 
-Returns the gospel reading for today's holy day (or preceding Sunday on weekdays).
+The gospel of the day in the active year cycle.
 
-## Request
+## Parameters
 
-```
-GET /api/v1/today/gospel
-```
+| Parameter | Description |
+|---|---|
+| `?day=<slug>` | Another day or service on the date (see [Several days on one date](README.md#several-days-on-one-date)); 404 if not on the date |
 
-No parameters.
+Without `?day=`, the primary day is used: the date's holy day, or on a weekday the day whose material is used.
 
-## Response fields
+## Response
 
 | Field | Type | Description |
 |---|---|---|
-| `date` | string | Today's date |
-| `holyDay` | string\|null | Name of the holy day |
-| `yearCycle` | number | Active lectionary year cycle |
-| `gospel` | object\|null | The gospel reading, or `null` if unavailable |
-| `gospel.reference` | string | Bible reference, e.g. `"Joh. 1:1–14"` |
-| `gospel.bookIntro` | string | Liturgical introduction phrase |
-| `gospel.text` | string | Full gospel text in Finnish |
-
-## Example
-
-```
-GET /api/v1/today/gospel
-```
-
-```json
-{
-  "date": "2025-12-25",
-  "holyDay": "Joulupäivä",
-  "yearCycle": 1,
-  "gospel": {
-    "reference": "Joh. 1:1–14",
-    "bookIntro": "Evankeliumista Johanneksen mukaan, luvusta 1",
-    "text": "Alussa oli Sana. Sana oli Jumalan luona, ja Sana oli Jumala..."
-  }
-}
-```
-
-## Notes
-
-- On weekdays without a holy day, falls back to the preceding Sunday's gospel.
-- The year cycle follows the current church year automatically.
+| `date` | string | `YYYY-MM-DD` |
+| `day` | object\|null | `{ name, slug, type }` of the day this response is about |
+| `alsoOnThisDate` | array | The other days and services on the date, `{ name, slug, type }` |
+| `yearCycle` | number | Active year cycle |
+| `gospel` | object\|null | `reference`, `bookIntro`, `text`, optional `alternatives` |
