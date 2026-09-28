@@ -21,6 +21,7 @@ Quick access to the current day's liturgical data without specifying a date.
 | `GET /api/v1/today/propers` | [today-propers.md](today-propers.md) | Liturgical propers and rubrics for today: preface, Kyrie litany, psalm refrain, post-communion prayer |
 | `GET /api/v1/today/color` | [date-color.md](date-color.md) | Liturgical colour for today |
 | `GET /api/v1/today/liturgy` | [liturgy.md](liturgy.md) | Seasonal rubrics (Gloria, Hallelujah, Gloria Patri) for today |
+| `GET /api/v1/today/lectionary` | [daily-lectionary.md](daily-lectionary.md) | Prayer-hour texts of the weekly lectionary for today |
 
 ---
 
@@ -37,12 +38,13 @@ Look up any date from 1900 to 2100.
 | `GET /api/v1/date/:date/prayer` | [today-prayer.md](today-prayer.md) | A prayer of the day for a date |
 | `GET /api/v1/date/:date/gospel` | [today-gospel.md](today-gospel.md) | Gospel for a date |
 | `GET /api/v1/date/:date/liturgy` | [liturgy.md](liturgy.md) | Seasonal rubrics for a date |
+| `GET /api/v1/date/:date/lectionary` | [daily-lectionary.md](daily-lectionary.md) | Prayer-hour texts of the weekly lectionary for a date |
 
 ### Several days on one date
 
 Several days can fall on one date: 4. adventtisunnuntai, jouluaatto and jouluyö on a Sunday 24.12; pitkäperjantai, Jeesuksen kuolinhetki and pitkäperjantain ilta; hiljainen lauantai and pääsiäisyö; a Sunday and a prayer day. The full-day responses (`/today`, `/date/:date`) return all of them: `holyDay` plus `additionalServices`, each complete.
 
-The per-date views (`texts`, `prayer`, `gospel`, `propers`, `color`, `liturgy`, under both `/today/` and `/date/:date/`) are about one day at a time:
+The per-date views (`texts`, `prayer`, `gospel`, `propers`, `color`, `liturgy`, `lectionary`, under both `/today/` and `/date/:date/`) are about one day at a time:
 
 - without parameters they use the primary day (the first one listed in the official calendar, or on a weekday the day whose material is used)
 - `?day=<slug>` picks another one, e.g. `/api/v1/date/2026-04-04/liturgy?day=paasiaisyo`; a slug that is not on the date answers 404 with the ones that are
@@ -130,4 +132,5 @@ The generated calendar is tested against the ELCF's published *perikooppikalente
 | Dated calendars (test ground truth) | Perikooppikalenterit 2021–2029 (evl.fi) |
 | Liturgical propers | Jumalanpalvelusten kirja (Kirkkokäsikirja I, 2000) |
 | Lectionary Bible index | Viikkolektionaarin raamatunkohdat (PDF) |
+| Weekly lectionary texts, altar candles | Kirkkovuosikalenteri (kirkkovuosikalenteri.fi), © Kirkkohallitus |
 | Easter computation | Anonymous Gregorian algorithm (Meeus/Jones/Butcher) |

@@ -12,7 +12,7 @@ All read-only.
 |---|---|---|
 | `kvk_day` | `date?`, `language?` (`fi`/`sv`), `sections?` (`texts`, `lectionary`, `prayers`, `hymns`) | Everything for a date: holy day(s) or on a weekday the preceding Sunday, period, colour, altar candles, description; Bible texts of all three year cycles with the active one; psalm and hallelujah verse; weekly lectionary; prayers; hymns |
 | `kvk_lectionary` | `date?`, `language?` | The weekly lectionary: eve, morning, noon and evening prayer, day psalm, week psalm, apocrypha — psalms with cadence marks (`chant`) |
-| `kvk_liturgical_colors` | `year`, `month` | The colour of every day of a month |
+| `kvk_liturgical_colors` | `year`, `month` | The colour(s) of every day of a month (two on Holy Saturday); `marked` where the site's calendar view highlights a day (undocumented) |
 | `kvk_search` | `query`, `language?` | Holy days and pages by name |
 
 The site's HTML is converted to plain text with line breaks; psalms keep the two-space indentation of the second half-verse, and their `chant` version keeps the cadence marks (`*` pause, `_x_` the syllable where the cadence starts). Responses are cached in memory for 6 hours.

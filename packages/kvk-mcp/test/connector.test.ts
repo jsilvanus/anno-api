@@ -58,6 +58,15 @@ describe('KirkkovuosikalenteriConnector', () => {
     assert.equal(ld.hymns, undefined);
   });
 
+  it('converts the alternative sermon texts to passages (loppiainen)', async () => {
+    const { fn } = stubFetch({ '/wp-json/kirkkovuosi/v1/day/fi/6.1.2025': { body: fixture('day-fi-6.1.2025.json') } });
+    const day = await new KirkkovuosikalenteriConnector({ fetch: fn }).day('2025-01-06', 'fi', ['texts']) as any;
+    const alt = day.liturgicalDays[0].alternativeSermonTexts;
+    assert.deepEqual(alt.map((p: any) => p.reference), ['Joh. 8:12', 'Joh. 12:44–47', 'Luuk. 11:29–32']);
+    assert.match(alt[0].text, /^Evankeliumista Johanneksen mukaan, luvusta 8\n\n/);
+    assert.doesNotMatch(JSON.stringify(alt), /<[a-z]+[ >]|&nbsp;/);
+  });
+
   it('caches responses', async () => {
     const { fn, calls } = stubFetch({ [DAY_PATH]: { body: fixture('day-fi-28.9.2026.json') } });
     const c = new KirkkovuosikalenteriConnector({ fetch: fn });
@@ -67,7 +76,7 @@ describe('KirkkovuosikalenteriConnector', () => {
   });
 
   it('reports dates the calendar does not cover', async () => {
-    const { fn } = stubFetch({ '/wp-json/kirkkovuosi/v1/day/fi/1.1.2040': { body: JSON.stringify({ day_title: null, liturgical_days: [] }) } });
+    const { fn } = stubFetch({ '/wp-json/kirkkovuosi/v1/day/fi/1.1.2040': { status: 500, body: JSON.stringify({ code: 'no_calendar_day', message: 'Invalid calendar day', data: { status: 500 } }) } });
     await assert.rejects(new KirkkovuosikalenteriConnector({ fetch: fn }).day('2040-01-01'), /no data for 2040-01-01/);
   });
 
@@ -86,8 +95,18 @@ describe('KirkkovuosikalenteriConnector', () => {
     const { fn } = stubFetch({ '/wp-json/liturgicalColors/v1/2026/3': { body: fixture('colors-2026-3.json') } });
     const colors = await new KirkkovuosikalenteriConnector({ fetch: fn }).liturgicalColors(2026, 3) as any;
     assert.equal(colors.days.length, 31);
-    assert.deepEqual(colors.days[0], { date: '2026-03-01', color: 'violetti', colorEn: 'purple' });
-    assert.equal(colors.days.find((d: any) => d.date === '2026-03-22').color, 'valkoinen'); // Marian ilmestyspäivä
+    assert.deepEqual(colors.days[0], { date: '2026-03-01', colors: ['violetti'], colorsEn: ['purple'], marked: false });
+    assert.deepEqual(colors.days.find((d: any) => d.date === '2026-03-22').colors, ['valkoinen']); // Marian ilmestyspäivä
+  });
+
+  it('merges the highlight entries and splits two-colour days (Holy Week 2026)', async () => {
+    const { fn } = stubFetch({ '/wp-json/liturgicalColors/v1/2026/4': { body: fixture('colors-2026-4.json') } });
+    const colors = await new KirkkovuosikalenteriConnector({ fetch: fn }).liturgicalColors(2026, 4) as any;
+    assert.equal(colors.days.length, 30, 'one entry per date');
+    const byDate = Object.fromEntries(colors.days.map((d: any) => [d.date, d]));
+    assert.deepEqual(byDate['2026-04-03'], { date: '2026-04-03', colors: ['musta'], colorsEn: ['black'], marked: true });
+    assert.deepEqual(byDate['2026-04-04'].colors, ['musta', 'valkoinen']);
+    assert.equal(byDate['2026-04-01'].marked, false);
   });
 
   it('searches the site', async () => {

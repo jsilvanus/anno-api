@@ -7,7 +7,7 @@ import {
   getAllPrefaatiot, getAllKyrieLitaniat, getAllSynninpaastot, getAllKiitosrukoukset,
   getAllKertosaakeet, getAllKiitosrukouksetEhtoollinen, getImproperia,
   getIndexMeta, getByHolyDay, searchByReference, getHolyDayNames,
-  searchReadings, todayInFinland,
+  searchReadings, todayInFinland, weeklyLectionaryMeta,
 } from '@anno-api/core';
 
 const JPK = 'Jumalanpalvelusten kirja (2000)';
@@ -130,6 +130,13 @@ function liturgyView(date, query) {
   return { ...header, liturgy: day?.liturgy ?? resolved.liturgy };
 }
 
+function lectionaryView(date, query) {
+  const picked = selectDay(date, query);
+  if (picked.error) return picked;
+  const { day, header } = picked;
+  return { ...header, source: weeklyLectionaryMeta().source, lectionary: day?.dailyLectionary ?? null };
+}
+
 const DATE_VIEWS = {
   texts: textsView,
   prayer: prayerView,
@@ -137,6 +144,7 @@ const DATE_VIEWS = {
   propers: propersView,
   color: colorView,
   liturgy: liturgyView,
+  lectionary: lectionaryView,
 };
 
 /**

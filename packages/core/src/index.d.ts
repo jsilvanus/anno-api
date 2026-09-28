@@ -85,9 +85,34 @@ export interface Day {
   prayers: { number: number; text: string }[];
   hymns: Record<string, { number: string; title: string }[]> | null;
   propers: Propers;
-  weeklyLectionary: unknown[];
+  /** Number of altar candles, e.g. "Kaksi alttarikynttilää". */
+  altarCandles: string | null;
+  /** Prayer-hour texts of this day on this weekday (viikkolektionaari). */
+  dailyLectionary?: DailyLectionary | null;
   /** Rubrics of this day or service (null for an undated holy day lookup). */
   liturgy?: Liturgy | null;
+}
+
+export interface Passage {
+  reference: string;
+  text: string | null;
+  /** Psalm text with cadence marks: "*" pause, "_x_" syllable where the cadence starts. */
+  chant?: string;
+}
+
+export interface PrayerHour {
+  readings: Passage[];
+  psalms: Passage[];
+}
+
+export interface DailyLectionary {
+  eve: PrayerHour | null;
+  morning: PrayerHour | null;
+  noon: PrayerHour | null;
+  evening: PrayerHour | null;
+  dayPsalm: Passage[];
+  weekPsalm: Passage[];
+  apocrypha: Passage[];
 }
 
 export interface ChurchYear {
@@ -191,4 +216,7 @@ export function parseLiturgicalColor(text: string | null | undefined): unknown;
 export function colorForDay(text: string | null | undefined, options?: { weekday?: boolean }): LiturgicalColor | null;
 export function liturgicalRules(date: Date, calendar: unknown[], day: unknown): Liturgy;
 export function searchReadings(query: string): ReadingSearchResult[];
+export function dailyLectionary(slug: string, weekday: number): DailyLectionary | null;
+export function altarCandles(slug: string): string | null;
+export function weeklyLectionaryMeta(): { source: string; fetched: string };
 export function todayInFinland(now?: Date): string;

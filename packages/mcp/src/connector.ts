@@ -16,8 +16,12 @@ import {
   getImproperia,
   todayInFinland,
   parseDate,
+  weeklyLectionaryMeta,
   type Day,
   type ResolvedDate,
+  type DailyLectionary,
+  type PrayerHour,
+  type Passage,
 } from '@anno-api/core';
 
 export interface ConnectorContext {
@@ -47,6 +51,22 @@ export function validDate(date: string): boolean {
   return !Number.isNaN(d.getTime()) && d.toISOString().slice(0, 10) === date;
 }
 
+/** Prayer-hour texts reduced to their references. */
+function lectionaryReferences(l: DailyLectionary | null | undefined): unknown {
+  if (!l) return null;
+  const refs = (p: Passage[]) => p.map(x => x.reference);
+  const hour = (h: PrayerHour | null) => h && { readings: refs(h.readings), psalms: refs(h.psalms) };
+  return {
+    eve: hour(l.eve),
+    morning: hour(l.morning),
+    noon: hour(l.noon),
+    evening: hour(l.evening),
+    dayPsalm: refs(l.dayPsalm),
+    weekPsalm: refs(l.weekPsalm),
+    apocrypha: refs(l.apocrypha),
+  };
+}
+
 /** Strip text bodies, keeping references — for a compact answer. */
 function referencesOnly(day: Day | null): unknown {
   if (!day) return null;
@@ -64,6 +84,7 @@ function referencesOnly(day: Day | null): unknown {
     season: day.season,
     period: day.period,
     liturgicalColor: day.liturgicalColor,
+    altarCandles: day.altarCandles,
     replaces: day.replaces,
     texts: t && {
       yearCycle: t.yearCycle,
@@ -80,6 +101,7 @@ function referencesOnly(day: Day | null): unknown {
     hallelujah: day.hallelujah && { reference: day.hallelujah.reference, text: day.hallelujah.text },
     psalmVerse: day.psalmVerse && { reference: day.psalmVerse.reference, text: day.psalmVerse.text },
     liturgy: day.liturgy ?? null,
+    dailyLectionary: lectionaryReferences(day.dailyLectionary),
     prayerCount: day.prayers.length,
     hymns: day.hymns,
     propers: {
@@ -111,6 +133,23 @@ export class KirkkovuosiConnector {
     if (!validDate(d)) throw new Error('Invalid date. Use YYYY-MM-DD.');
     const resolved = resolveDate(d, { allYearCycles: false });
     return options.includeTexts === false ? compact(resolved) : resolved;
+  }
+
+  /**
+   * Prayer-hour texts of the weekly lectionary for a date: every day and
+   * service on the date, each with its morning, midday and evening prayer.
+   */
+  dailyLectionary(date: string | undefined, _context: ConnectorContext = {}): unknown {
+    const d = date ?? todayInFinland();
+    if (!validDate(d)) throw new Error('Invalid date. Use YYYY-MM-DD.');
+    const resolved = resolveDate(d, { allYearCycles: false });
+    const days = [resolved.holyDay, ...resolved.additionalServices, resolved.weekdayMaterial].filter((x): x is Day => Boolean(x));
+    return {
+      date: d,
+      dayOfWeek: resolved.dayOfWeek,
+      source: weeklyLectionaryMeta().source,
+      days: days.map(x => ({ name: x.name, slug: x.slug, type: x.type, lectionary: x.dailyLectionary ?? null })),
+    };
   }
 
   /** One holy day by slug or by (part of its) name. */

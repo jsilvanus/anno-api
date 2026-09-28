@@ -106,7 +106,7 @@ interface RawLiturgicalDay {
   candles?: string | null;
   bible_texts?: string;
   hymns?: { group_name?: string; hymns?: { number?: string; name?: string; url?: string }[] }[];
-  alternative_sermon_texts?: unknown;
+  alternative_sermon_texts?: { bible_verse?: string; bible_text?: string }[] | false;
   first_liturgical_volume?: Record<string, Record<string, string>[]>;
   second_liturgical_volume?: Record<string, Record<string, string>[]>;
   third_liturgical_volume?: Record<string, Record<string, string>[]>;
@@ -168,7 +168,9 @@ function convertDay(raw: RawLiturgicalDay, sections: Set<Section>, activeCycle: 
     for (const n of [1, 2, 3] as const) cycles[n] = yearCycle(raw[VOLUMES[n]]);
     day.activeYearCycle = activeCycle;
     day.yearCycles = cycles;
-    day.alternativeSermonTexts = Array.isArray(raw.alternative_sermon_texts) ? raw.alternative_sermon_texts : [];
+    day.alternativeSermonTexts = (raw.alternative_sermon_texts || [])
+      .map(x => passage(x.bible_verse, x.bible_text))
+      .filter((p): p is Passage => p !== null);
   }
   if (sections.has('lectionary')) day.lectionary = lectionary(raw.lectionary);
   if (sections.has('prayers')) day.prayers = (raw.daily_prayers ?? []).map(p => htmlToText(p.verse)).filter(Boolean);
@@ -212,6 +214,7 @@ export class KirkkovuosikalenteriConnector {
     let value: unknown;
     try { value = JSON.parse(text); } catch { throw new Error(`Kirkkovuosikalenteri answered ${res.status} with non-JSON content.`); }
     if (!res.ok) {
+      if ((value as { code?: string })?.code === 'no_calendar_day') return null;
       const message = (value as { message?: string })?.message;
       throw new Error(`Kirkkovuosikalenteri answered ${res.status}${message ? ': ' + message : ''}`);
     }
@@ -244,19 +247,29 @@ export class KirkkovuosikalenteriConnector {
     };
   }
 
-  /** The liturgical colour of every day of a month. */
+  /**
+   * The liturgical colour of every day of a month. A day can have two colours
+   * (Holy Saturday: black, then white for the Easter Vigil). `marked`: the site
+   * adds a "background" highlight to some days in its calendar view. Its meaning
+   * is undocumented (in April 2026: 2.–4.4. and 6.4., but not Easter Day).
+   */
   async liturgicalColors(year: number, month: number, _context: ConnectorContext = {}): Promise<unknown> {
     if (!Number.isInteger(year) || !Number.isInteger(month) || month < 1 || month > 12) throw new Error('Give year and month (1–12).');
-    const raw = await this.get(`/wp-json/liturgicalColors/v1/${year}/${month}`) as { start?: string; classNames?: string[] }[];
-    return {
-      year,
-      month,
-      days: (Array.isArray(raw) ? raw : []).map(entry => {
-        const cls = (entry.classNames ?? []).find(c => c.startsWith('liturgical-color--'));
-        const key = cls?.slice('liturgical-color--'.length) ?? null;
-        return { date: entry.start ?? null, color: key ? COLOR_CLASSES[key] ?? key : null, colorEn: key };
-      }),
-    };
+    const raw = await this.get(`/wp-json/liturgicalColors/v1/${year}/${month}`) as { start?: string; classNames?: string[]; rendering?: string }[];
+    const days = new Map<string, { date: string; colors: string[]; colorsEn: string[]; marked: boolean }>();
+    for (const entry of Array.isArray(raw) ? raw : []) {
+      if (!entry.start) continue;
+      const day = days.get(entry.start) ?? { date: entry.start, colors: [], colorsEn: [], marked: false };
+      days.set(entry.start, day);
+      if (entry.rendering === 'background') day.marked = true;
+      const cls = (entry.classNames ?? []).find(c => c.startsWith('liturgical-color--'));
+      // "liturgical-color--black_liturgical-color--white" → black, white
+      for (const key of cls ? cls.split('_').map(c => c.replace('liturgical-color--', '')) : []) {
+        day.colorsEn.push(key);
+        day.colors.push(COLOR_CLASSES[key] ?? key);
+      }
+    }
+    return { year, month, days: [...days.values()].sort((a, b) => a.date.localeCompare(b.date)) };
   }
 
   /** Search the calendar's pages and holy days. */

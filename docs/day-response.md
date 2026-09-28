@@ -42,6 +42,7 @@ Weekdays use the material of the week's Sunday ("Arkipäivinä käytetään … 
 | `description` | string | Introduction from Evankeliumikirja |
 | `liturgicalColor` | Color | Colour of the day (on weekday material: the weekday colour) |
 | `replaces` | string \| null | Slug of the Sunday whose place the feast takes |
+| `altarCandles` | string \| null | Number of altar candles, e.g. "Kaksi alttarikynttilää" (Kirkkovuosikalenteri) |
 | `materialFrom` | string | Only for 6. sunnuntai loppiaisesta: its texts come from 26. sunnuntai helluntaista |
 | `texts` | Texts | Readings of the active year cycle |
 | `allYearCycles` | object | Readings of all three cycles (days with cycles; omitted with `?cycles=false`) |
@@ -51,7 +52,7 @@ Weekdays use the material of the week's Sunday ("Arkipäivinä käytetään … 
 | `prayers` | array | `{ number, text }` — päivän rukoukset |
 | `hymns` | object | `opening`, `dayHymns`, `additional`, `other` — `{ number, title }` |
 | `propers` | object | `prefaatio`, `kyrieLitania`, `kertosae`, `postCommunionPrayer` (kiitosrukous ehtoollisen jälkeen); `null` where the book gives no seasonal text |
-| `weeklyLectionary` | array | Viikkolektionaari entries listed for this day (evening before, psalms, …) |
+| `dailyLectionary` | object \| null | The prayer-hour texts of this day on this weekday: morning, midday and evening prayer, day's psalm, and on Sundays and holy days the eve reading, week's psalm and apocrypha. See [daily-lectionary.md](daily-lectionary.md) |
 
 ### Texts
 

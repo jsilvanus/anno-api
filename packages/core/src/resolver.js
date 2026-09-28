@@ -23,7 +23,7 @@ import {
   dayOfWeek,
 } from './computus.js';
 import { getPropers } from './propers.js';
-import { getByHolyDay } from './lectionary.js';
+import { dailyLectionary, altarCandles } from './weekly-lectionary.js';
 import { parseLiturgicalColor, colorForDay } from './colors.js';
 import { liturgicalRules } from './rules.js';
 
@@ -156,18 +156,6 @@ function textsFor(data, yearCycle) {
   return null;
 }
 
-/** The weekly lectionary (viikkolektionaari) entries listed for this day. */
-function weeklyLectionaryFor(name) {
-  const q = name.toLowerCase();
-  const results = getByHolyDay(q);
-  const entries = [];
-  for (const [key, readings] of Object.entries(results)) {
-    const k = key.toLowerCase().replace(/;$/, '');
-    if (k === q || k.startsWith(q + ' (')) entries.push(...readings);
-  }
-  return entries;
-}
-
 /**
  * Build the full description of one day of the church year.
  *
@@ -195,6 +183,7 @@ function enrichEntry(entry, yearCycle, { weekday = false, allYearCycles = true }
     period: data?.period ?? null,
     description: data?.description ?? null,
     liturgicalColor: colorForDay(colorSource?.liturgicalColor, { weekday }),
+    altarCandles: altarCandles(entry.slug),
     replaces: entry.replaces ?? null,
   };
   if (MATERIAL_FROM[dataSlug]) result.materialFrom = MATERIAL_FROM[dataSlug];
@@ -207,7 +196,6 @@ function enrichEntry(entry, yearCycle, { weekday = false, allYearCycles = true }
   result.prayers = material?.prayers ?? [];
   result.hymns = material?.hymns ?? null;
   result.propers = getPropers(dataSlug, data);
-  result.weeklyLectionary = weeklyLectionaryFor(entry.name);
 
   return result;
 }
@@ -225,6 +213,7 @@ function enrichEntry(entry, yearCycle, { weekday = false, allYearCycles = true }
  * - `liturgicalColor`: the colour of the day
  * - `liturgy`: rubrics of the day's main service (Gloria, Hallelujah, Gloria Patri);
  *   every day and service in the response also carries its own `liturgy`
+ *   and `dailyLectionary` (the prayer-hour texts of that weekday)
  *
  * @param {Date|string} date - Date object or YYYY-MM-DD string
  * @param {object} [options]
@@ -270,9 +259,20 @@ export function resolveDate(date, { allYearCycles = true } = {}) {
     }
   }
 
-  // Rubrics per day and service: pääsiäisyö on Holy Saturday differs from the day itself
+  // Per day and service: rubrics (pääsiäisyö on Holy Saturday differs from the day
+  // itself) and the prayer-hour texts of this weekday
   for (const d of [holyDay, ...additionalServices, weekdayMaterial]) {
-    if (d) d.liturgy = liturgicalRules(date, calendar, d);
+    if (!d) continue;
+    d.liturgy = liturgicalRules(date, calendar, d);
+    d.dailyLectionary = dailyLectionary(d.slug, dayOfWeek(date));
+  }
+  // The evening before a Sunday or feast reads that day's eve text. Kirkkovuosikalenteri
+  // leaves it out where the next day varies (Saturday 3.1. before 2. sunnuntai joulusta
+  // or loppiainen); take it from the next day.
+  const evening = weekdayMaterial?.dailyLectionary?.evening;
+  if (evening && !evening.readings.length) {
+    const eve = nextDayEve(date);
+    if (eve) evening.readings = eve;
   }
 
   const day = holyDay ?? weekdayMaterial;
@@ -296,6 +296,24 @@ export function resolveDate(date, { allYearCycles = true } = {}) {
 /**
  * Get Finnish day of week name.
  */
+/** The eve reading(s) of the Sunday or feast on the day after `date`, or null. */
+function nextDayEve(date) {
+  const next = addDays(date, 1);
+  const nextStr = formatDate(next);
+  const own = getCalendar(getChurchYearStart(next))
+    .filter(e => e.dateStr === nextStr && e.type !== 'weekday' && e.type !== 'observance');
+  // The eve text is the feast's own; the site has it only for some weekdays
+  // (loppiainen's eve 2. Kor. 4:3–6 only when 6.1. is a Sunday).
+  const weekdays = [dayOfWeek(next), 0, 1, 2, 3, 4, 5, 6];
+  for (const e of own) {
+    for (const wd of weekdays) {
+      const readings = dailyLectionary(e.slug, wd)?.eve?.readings;
+      if (readings?.length) return readings;
+    }
+  }
+  return null;
+}
+
 function getDayOfWeekFi(date) {
   return ['sunnuntai', 'maanantai', 'tiistai', 'keskiviikko', 'torstai', 'perjantai', 'lauantai'][dayOfWeek(date)];
 }
@@ -316,6 +334,7 @@ export function getHolyDay(slug, { yearCycle = null, churchYear = null } = {}) {
   const day = enrichEntry({ slug, name: data.name, type: entry?.type ?? null, dateStr: entry?.dateStr ?? null, replaces: entry?.replaces }, cycle);
   // Rubrics apply to a dated day; weekday-material entries (e.g. 26. sunnuntai helluntaista in a short year) have none
   day.liturgy = entry ? liturgicalRules(entry.date, calendar, day) : null;
+  day.dailyLectionary = entry ? dailyLectionary(slug, dayOfWeek(entry.date)) : null;
   return { ...day, churchYear: churchYearInfo(start) };
 }
 

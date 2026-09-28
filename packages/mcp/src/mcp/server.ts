@@ -57,6 +57,7 @@ const INSTRUCTIONS = [
   'propers and seasonal rubrics (Jumalanpalvelusten kirja 2000), and the weekly lectionary (viikkolektionaari).',
   'Dates are in Finnish time; "today" is today in Finland. Texts are in Finnish.',
   'Start with church_day for a date, holy_day for a named day, or upcoming_holy_days for the next Sundays.',
+  'For daily prayer (morning, midday, evening), use daily_lectionary.',
   'On weekdays without their own holy day, weekdayMaterial is the day whose texts and prayers are used.',
 ].join(' ');
 
@@ -91,6 +92,19 @@ export function createMcpServer(options: McpServerOptions): McpServer {
     }),
     tool<{ date?: string | undefined; include_texts?: boolean | undefined }>((args, ctx) =>
       connector.day(args.date, args.include_texts === undefined ? {} : { includeTexts: args.include_texts }, ctx)),
+  );
+
+  server.registerTool(
+    'daily_lectionary',
+    withOAuthSecurity({
+      title: 'Daily prayer texts (viikkolektionaari)',
+      description: 'The weekly lectionary for a date, with full texts: the morning and evening reading, the psalms of the morning, ' +
+        'midday and evening prayer, the day\'s psalm, and on Sundays and holy days the week\'s psalm, the eve reading and the ' +
+        'week\'s apocrypha text. Weekday readings follow the preceding Sunday. Psalms also come with cadence marks for chanting.',
+      inputSchema: { date: dateArg },
+      annotations: readOnly,
+    }),
+    tool<{ date?: string | undefined }>((args, ctx) => connector.dailyLectionary(args.date, ctx)),
   );
 
   server.registerTool(
