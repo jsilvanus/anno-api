@@ -10,30 +10,9 @@ GET /api/v1/today
 
 No parameters.
 
-## Response fields
+## Response
 
-| Field | Type | Description |
-|---|---|---|
-| `date` | string | Today's date (`YYYY-MM-DD`) |
-| `churchYear.start` | number | Calendar year in which this church year began |
-| `churchYear.label` | string | Church year label, e.g. `"2025–2026"` |
-| `churchYear.yearCycle` | number | Lectionary year cycle: `1`, `2`, or `3` |
-| `holyDay` | object\|null | Data for the primary holy day, or `null` on plain weekdays |
-| `holyDay.name` | string | Finnish name of the holy day |
-| `holyDay.slug` | string | URL-safe identifier |
-| `holyDay.liturgicalColor` | string | Liturgical color for the day |
-| `holyDay.description` | string | Description and theological context |
-| `holyDay.texts` | object | Bible readings for the active year cycle |
-| `holyDay.allYearCycles` | object | Readings for all three year cycles |
-| `holyDay.psalm` | object | Psalm with antiphon and text |
-| `holyDay.psalmVerse` | array | Psalm verse(s) for the day |
-| `holyDay.prayers` | array | Collect prayers (usually 3 options) |
-| `holyDay.hymns` | object | Suggested hymn numbers by category |
-| `holyDay.propers` | object | Liturgical propers (prefaatio, kyrieLitania, kertosae) |
-| `precedingSunday` | object\|null | On weekdays: enriched data for the preceding Sunday |
-| `additionalServices` | array | Other services on the same day (e.g. vigil alongside a feast) |
-| `dayOfWeek` | string | Finnish day name (`maanantai`…`sunnuntai`) |
-| `season` | string | Liturgical season |
+See [day-response.md](day-response.md) for every field. Add `?cycles=false` to leave out the texts of the other year cycles.
 
 ## Example
 
@@ -47,7 +26,7 @@ GET /api/v1/today
   "churchYear": {
     "start": 2025,
     "label": "2025–2026",
-    "yearCycle": 1
+    "yearCycle": 2
   },
   "holyDay": {
     "name": "Joulupäivä",
@@ -55,7 +34,7 @@ GET /api/v1/today
     "liturgicalColor": "valkoinen",
     "description": "...",
     "texts": {
-      "yearCycle": 1,
+      "yearCycle": 2,
       "firstReading": {
         "reference": "Jes. 52:7–10",
         "bookIntro": "Jesajan kirjasta, luvusta 52",

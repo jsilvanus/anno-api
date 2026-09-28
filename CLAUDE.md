@@ -2,87 +2,109 @@
 
 ## Project
 
-Kirkkovuosi API — a zero-dependency Node.js REST API for the liturgical calendar of the Evangelical-Lutheran Church of Finland. Provides church year dates, Bible readings, liturgical propers, and a lectionary Bible index.
+Kirkkovuosi — the church year of the Evangelical-Lutheran Church of Finland as a REST API and an MCP server. Church year dates, Bible readings, liturgical propers, colours, rubrics and a lectionary Bible index.
 
 ## Commands
 
 ```bash
-npm start           # start server (port 3000, or $PORT)
-npm run dev         # start with --watch (auto-restart)
-npm test            # run test suite (node --test)
+npm install          # workspaces; links @anno-api/core into the other packages
+npm start            # REST API (port 3000, or $PORT)
+npm run dev          # REST API with --watch
+npm test             # all packages
+npm run build        # compile packages/mcp (TypeScript)
+npm run start:mcp    # MCP server (needs packages/mcp/.env: MCP_PUBLIC_URL, JWT_SECRET)
+npm test -w @anno-api/core   # one package
 ```
+
+Node.js ≥ 22.5 (the MCP server uses `node:sqlite`).
 
 ## Architecture
 
-ES modules throughout (`"type": "module"` in package.json). No build step.
+npm workspaces monorepo, ES modules throughout.
 
 ```
-src/
-├── index.js            Entry point. Defines Router class, creates HTTP server.
-├── routes/api.js       All route handlers. Imports from services/.
-├── services/
-│   ├── computus.js     Pure functions: Easter date, moveable feasts, date utils.
-│   ├── resolver.js     resolveDate() — maps a calendar date to its church day.
-│   ├── propers.js      Looks up prefaatiot, kyrie litaniat, etc. from propers.json.
-│   └── lectionary.js   Looks up Bible passage index from lectionary-index.json.
-├── data/               JSON data files (loaded lazily, cached in memory).
-├── tests/api.test.js   Uses node:test. Import from services directly.
-└── parsers/            One-off scripts that generate the JSON data files.
+packages/
+├── core/  @anno-api/core   Plain JS, zero dependencies. Types in src/index.d.ts.
+│   ├── src/computus.js     Easter, church year calendar, weekday material rules, year cycle.
+│   ├── src/resolver.js     resolveDate(), getHolyDay() — a date → everything that varies.
+│   ├── src/propers.js      Prefaatiot, Kyrie litanies, kertosäkeet, post-communion prayers.
+│   ├── src/colors.js       Parses colour texts ("valkoinen, maanantaista lauantaihin vihreä").
+│   ├── src/rules.js        Seasonal rubrics (Gloria, Hallelujah, Gloria Patri).
+│   ├── src/lectionary.js   Lectionary Bible index.
+│   ├── src/search.js       Search readings by Bible reference.
+│   ├── data/               JSON data (loaded lazily, cached in memory).
+│   ├── parsers/            Scripts that generate data/ from refs/.
+│   └── test/               node:test; fixtures/perikooppikalenterit.json.
+├── api/   @anno-api/api    Zero-dependency HTTP server. src/index.js (Router, createServer), src/routes.js.
+└── mcp/   @anno-api/mcp    TypeScript, from the Codestash scaffold mcp/api-connector-style.
+    ├── src/connector.ts    KirkkovuosiConnector — calls @anno-api/core in-process.
+    ├── src/mcp/server.ts   MCP tools.
+    ├── src/oauth/          Embedded OAuth server: sign-in + registration page, consent, PKCE, tokens.
+    └── src/app.ts          buildApp() for tests; src/server.ts reads the environment.
 ```
 
 ## Key design points
 
-- **No external dependencies.** Uses only Node.js built-ins: `http`, `fs`, `path`, `url`, `node:test`.
-- **Data is loaded lazily and cached.** Each service file has a module-level cache variable initialized on first call.
-- **Router** in `src/index.js` converts `:param` patterns to regex. Route handlers in `api.js` receive `{ params, query }`.
-- **Church year** starts on 1st Advent Sunday (nearest Sunday to Nov 30). The three-year lectionary cycle is determined by `churchYearStartYear % 3`.
-- **Data directory** is resolved relative to the service file's `__dirname`: `join(__dirname, '..', 'data')`.
+- **core and api have no external dependencies.** Only Node.js built-ins. The MCP package has its own dependencies (fastify, MCP SDK, jose, argon2, zod).
+- **Data is loaded lazily and cached.** Each core module has a module-level cache initialised on first call. Data directory: `join(__dirname, '..', 'data')`.
+- **Router** in `packages/api/src/index.js` converts `:param` patterns to regex. Handlers receive `{ params, query }`; returning `{ error, status? }` sends that status (default 400).
+- **Church year** starts on 1st Advent Sunday (Sunday Nov 27 – Dec 3). **Year cycle** = `((start + 1) % 3) + 1` — 2025–2026 is the 2nd vuosikerta (per evl.fi).
+- **Calendar entries** have a `type` (`sunday`, `feast`, `day`, `service`, `observance`, `weekday`). Sundays carry `sundaySlug`; a feast that takes a Sunday's place (kynttilänpäivä, Marian ilmestyspäivä, mikkelinpäivä, Dec 26–28) carries `replaces`. Weekdays use the displaced Sunday's material (`weekdayMaterialSlug`).
+- **The official perikooppikalenterit are ground truth.** `test/perikooppikalenteri.test.js` checks every date, name, reading, psalm and hallelujah verse for 2021–2029. Any calendar or data change must keep it green. Add a year by dropping `kvYYYY.doc` into `refs/perikooppikalenterit/` and running `npm run parse:perikooppikalenterit -w @anno-api/core`.
+- **Rubrics** (`liturgy`) are computed per day or service and follow what Evankeliumikirja prints (hallelujasäe vs psalmilause, `psalm.gloriaPatri`); Gloria is kept on kiirastorstai, Marian ilmestyspäivä and pääsiäisyö. See `src/rules.js`.
+- **"Today"** is computed in Finnish time (`todayInFinland()`), not UTC.
+- **MCP auth:** every `/mcp` request needs a bearer token (401 + `WWW-Authenticate` otherwise). The OAuth sign-in page is the only web UI; it also has the registration form. Read `packages/mcp/LEARNED.md` before changing OAuth plumbing.
 
 ## Data files
 
 | File | Generated by | Description |
 |---|---|---|
-| `data/all-days.json` | `parsers/parse-evankeliumikirja.js` | All holy days with readings, prayers, psalms |
-| `data/propers.json` | `parsers/parse-jpkirja.js` | Prefaatiot, kyrie litaniat, etc. |
-| `data/lectionary-index.json` | `parsers/parse-lectionary-index.js` | 2073 Bible passage → liturgical occasion entries |
-| `data/lectionary-index.txt` | `pdftotext` (poppler-utils) | Raw text extracted from the PDF |
+| `core/data/all-days.json` | `parse-evankeliumikirja.js`, then `merge-evankeliumikirja-pdf.js` | All holy days: readings, psalms, prayers, hymns, colours, themes |
+| `core/data/periods.json` | `merge-evankeliumikirja-pdf.js` | Period (aika) introductions |
+| `core/data/index.json` | `merge-evankeliumikirja-pdf.js` | Holy day index |
+| `core/data/propers.json` | `parse-jpkirja.js` | Prefaatiot, Kyrie litanies, kiitosrukoukset, kertosäkeet, … |
+| `core/data/lectionary-index.json` | `parse-lectionary-index.js` | 2073 Bible passage → occasion entries |
+| `core/test/fixtures/perikooppikalenterit.json` | `parse-perikooppikalenteri.js` | Official dated calendars 2021–2029 |
 
-To regenerate the lectionary index after changing the PDF:
+To regenerate from the Evankeliumikirja PDF (poppler-utils):
 ```bash
-pdftotext refs/viikkolektionaarin_raamatunkohdat.pdf src/data/lectionary-index.txt
-node src/parsers/parse-lectionary-index.js
+pdftotext -raw refs/evankeliumikirja.pdf refs/evankeliumikirja.txt
+pdftotext refs/evankeliumikirja.pdf refs/evankeliumikirja-layout.txt
+npm run parse:evankeliumikirja -w @anno-api/core
+```
+The merge keeps existing texts and fills gaps from the PDF; it is idempotent.
+
+To regenerate the lectionary index:
+```bash
+pdftotext refs/viikkolektionaarin_raamatunkohdat.pdf packages/core/data/lectionary-index.txt
+node packages/core/parsers/parse-lectionary-index.js
 ```
 
-## Reference documents
-
-Source documents used to generate the data files are kept in `refs/`:
+## Reference documents (`refs/`)
 
 | File | Description |
 |---|---|
-| `refs/jpkirja.doc` | Jumalanpalvelusten kirja (Kirkkokäsikirja I) — source for propers |
-| `refs/viikkolektionaarin_raamatunkohdat.pdf` | Source PDF for lectionary Bible index |
+| `evankeliumikirja.pdf` | Evankeliumikirja 2021 (kirkkokasikirja.fi) — readings, prayers, colours |
+| `evankeliumikirja*.txt`, `evankeliumikirja-pdf.json` | Extracted text and its parse (intermediate) |
+| `jpkirja.doc` | Jumalanpalvelusten kirja (Kirkkokäsikirja I) — propers and rubrics |
+| `perikooppikalenterit/kvYYYY.doc` | ELCF pericope calendars (evl.fi) — test ground truth |
+| `viikkolektionaarin_raamatunkohdat.pdf` | Source PDF for the lectionary Bible index |
 
-To parse jpkirja, first convert the `.doc` to markdown (e.g. with pandoc), then run:
+To parse jpkirja, convert the `.doc` to markdown (e.g. pandoc), then:
 ```bash
-node src/parsers/parse-jpkirja.js refs/jpkirja.md src/data
+node packages/core/parsers/parse-jpkirja.js refs/jpkirja.md packages/core/data
 ```
 
 ## Testing
 
-Tests use `node:test` (built-in). Run with:
-```bash
-npm test
-# or directly:
-node --test src/tests/*.test.js
-```
+`node:test` everywhere; the MCP tests run TypeScript through tsx. Core tests import modules directly; API tests start the server on an ephemeral port; MCP tests run sign-up → consent → token → `/mcp` end to end. All tests must pass before committing.
 
-Tests import directly from service modules (`../services/computus.js`, `../services/resolver.js`). They do not start the HTTP server. All 30 tests must pass before committing.
+## Adding an API endpoint
 
-## Adding a new API endpoint
-
-1. Add the route handler in `src/routes/api.js` using `routes.get('/api/v1/...', handler)`.
-2. Add the endpoint description to the list in `src/index.js` (the root info response).
-3. If new data is needed, add a service in `src/services/` and a data file in `src/data/`.
+1. Add the handler in `packages/api/src/routes.js` (`routes.get('/api/v1/...', handler)`).
+2. Add it to `ENDPOINTS` in `packages/api/src/index.js` and to `docs/`.
+3. Put logic and data in `packages/core` and export it from `src/index.js` (+ `index.d.ts`), so the MCP server can use it too.
+4. For MCP, add a connector method and a tool in `packages/mcp/src/mcp/server.ts`.
 
 ## Finnish terminology
 
@@ -90,17 +112,22 @@ Tests import directly from service modules (`../services/computus.js`, `../servi
 |---|---|
 | kirkkovuosi | church year |
 | pyhäpäivä | holy day / feast day |
+| pistepyhä | fixed-date feast observed on a Sunday |
 | lukukappale | reading / lesson |
 | evankeliumi | gospel |
-| psalmi | psalm |
+| psalmi, psalmilause | psalm, Lent psalm verse (instead of hallelujah) |
+| hallelujasäe | hallelujah verse |
 | prefaatio | preface (liturgical) |
 | kyrie-litania | Kyrie litany |
 | synninpäästö | absolution |
 | kertosäe | psalm refrain |
+| kiitosrukous ehtoollisen jälkeen | post-communion prayer |
+| Kunnia (Gloria), Pieni kunnia (Gloria Patri) | Gloria in excelsis, Gloria Patri |
 | sunnuntai | Sunday |
 | adventtiaika | Advent season |
-| paastonaika | Lent |
+| paastonaika, kärsimysaika | Lent, Passiontide |
 | pääsiäinen | Easter |
 | helluntai | Pentecost |
 | loppiainen | Epiphany |
 | vuosikerta (vsk.) | lectionary year cycle |
+| perikooppikalenteri | pericope calendar |

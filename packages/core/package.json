@@ -1,0 +1,21 @@
+{
+  "name": "@anno-api/core",
+  "version": "2.0.0",
+  "description": "Church year calendar, readings and liturgical propers of the Evangelical-Lutheran Church of Finland",
+  "type": "module",
+  "main": "src/index.js",
+  "types": "src/index.d.ts",
+  "exports": {
+    ".": {
+      "types": "./src/index.d.ts",
+      "default": "./src/index.js"
+    }
+  },
+  "files": ["src", "data"],
+  "scripts": {
+    "test": "node --test test/*.test.js",
+    "parse:perikooppikalenterit": "node parsers/parse-perikooppikalenteri.js ../../refs/perikooppikalenterit test/fixtures/perikooppikalenterit.json",
+    "parse:evankeliumikirja": "node parsers/parse-evankeliumikirja-pdf.js ../../refs/evankeliumikirja.txt ../../refs/evankeliumikirja-pdf.json ../../refs/evankeliumikirja-layout.txt && node parsers/merge-evankeliumikirja-pdf.js data ../../refs/evankeliumikirja-pdf.json"
+  },
+  "license": "ISC"
+}
