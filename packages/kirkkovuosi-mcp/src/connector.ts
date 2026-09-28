@@ -139,7 +139,7 @@ function yearCycle(volume: Record<string, Record<string, string>[]> | undefined)
 }
 
 const LECTIONARY_FIELDS: Record<string, string> = {
-  eve: 'eve', morning: 'morning', noon: 'noon', evening: 'evening',
+  eve: 'firstVespers', morning: 'morning', noon: 'noon', evening: 'evening',
   psalms: 'dayPsalm', week: 'weekPsalm', apocrypha: 'apocrypha',
 };
 
@@ -245,6 +245,34 @@ export class KirkkovuosikalenteriConnector {
       liturgicalDays: (raw.liturgical_days ?? []).map(ld => convertDay(ld, wanted, activeCycle)),
       source: language === 'sv' ? 'Kyrkoårskalendern (kyrkoarskalendern.fi)' : 'Kirkkovuosikalenteri (kirkkovuosikalenteri.fi)',
     };
+  }
+
+  /**
+   * The weekly lectionary of a date, with this evening's vespers. Saturday has no
+   * vespers of its own: the evening before a Sunday or feast is its first vespers
+   * (the site's `eve` of the next date), and a Sunday's own evening its second
+   * vespers. The site files Saturday's `evening` under the week, which in some
+   * years is followed by a different Sunday or feast, so `tonight` is taken from
+   * the next date.
+   */
+  async lectionary(date: string | undefined, language: Language = 'fi', context: ConnectorContext = {}): Promise<unknown> {
+    const iso = date ?? todayInFinland();
+    const day = await this.day(iso, language, ['lectionary'], context) as {
+      liturgicalDays: { title: string | null; lectionary: Record<string, Passage[]> }[];
+    };
+    const nextIso = new Date(Date.parse(iso + 'T00:00:00Z') + 86_400_000).toISOString().slice(0, 10);
+    let next: typeof day | null = null;
+    try {
+      next = await this.day(nextIso, language, ['lectionary'], context) as typeof day;
+    } catch { /* the next date is outside the calendar */ }
+    const feast = next?.liturgicalDays.find(ld => ld.lectionary.firstVespers?.length);
+    const own = day.liturgicalDays.find(ld => ld.lectionary.firstVespers?.length);
+    const tonight = feast
+      ? { vespers: 'first', of: feast.title, date: nextIso, passages: feast.lectionary.firstVespers }
+      : own
+        ? { vespers: 'second', of: own.title, date: iso, passages: own.lectionary.evening }
+        : { vespers: null, of: day.liturgicalDays[0]?.title ?? null, date: iso, passages: day.liturgicalDays[0]?.lectionary.evening ?? [] };
+    return { ...day, tonight };
   }
 
   /**

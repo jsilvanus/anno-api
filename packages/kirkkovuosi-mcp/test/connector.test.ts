@@ -67,6 +67,25 @@ describe('KirkkovuosikalenteriConnector', () => {
     assert.doesNotMatch(JSON.stringify(alt), /<[a-z]+[ >]|&nbsp;/);
   });
 
+  it('gives Saturday evening the next Sunday\'s first vespers, not the site\'s week-based evening (31.1.2026)', async () => {
+    const { fn } = stubFetch({
+      '/wp-json/kirkkovuosi/v1/day/fi/31.1.2026': { body: fixture('day-fi-31.1.2026.json') },
+      '/wp-json/kirkkovuosi/v1/day/fi/1.2.2026': { body: fixture('day-fi-1.2.2026.json') },
+      '/wp-json/kirkkovuosi/v1/day/fi/2.2.2026': { status: 500, body: JSON.stringify({ code: 'no_calendar_day', message: 'Invalid calendar day' }) },
+    });
+    const c = new KirkkovuosikalenteriConnector({ fetch: fn });
+    const sat = await c.lectionary('2026-01-31') as any;
+    // The site files 4. sunnuntai loppiaisesta's eve (Hoos. 2:20–25) under this week's Saturday
+    assert.equal(sat.liturgicalDays[0].lectionary.evening[0].reference, 'Hoos. 2:20–25');
+    assert.equal(sat.tonight.vespers, 'first');
+    assert.equal(sat.tonight.date, '2026-02-01');
+    assert.match(sat.tonight.of, /^3\. sunnuntai ennen paastonaikaa/);
+    assert.deepEqual(sat.tonight.passages.map((p: any) => p.reference), ['1. Moos. 6:9–22', 'Ps. 122']);
+    const sun = await c.lectionary('2026-02-01') as any; // next date not covered: still answers
+    assert.equal(sun.tonight.vespers, 'second');
+    assert.deepEqual(sun.tonight.passages.map((p: any) => p.reference), ['2. Kor. 6:1–2', 'Ps. 8:2–10']);
+  });
+
   it('caches responses', async () => {
     const { fn, calls } = stubFetch({ [DAY_PATH]: { body: fixture('day-fi-28.9.2026.json') } });
     const c = new KirkkovuosikalenteriConnector({ fetch: fn });

@@ -102,13 +102,15 @@ export function createMcpServer(options: McpServerOptions): McpServer {
     withOAuthSecurity({
       title: 'Daily prayer texts',
       description: 'The weekly lectionary (viikkolektionaari) for a date: morning and evening reading, the psalms of the morning, ' +
-        'midday and evening prayer, the day psalm, and on Sundays and holy days the eve reading, week psalm and apocrypha text. ' +
+        'midday and evening prayer, the day psalm, and on Sundays and holy days their first vespers, week psalm and apocrypha text. ' +
+        'Saturday has no vespers of its own: `tonight` is the evening prayer to use — the next Sunday\'s or feast\'s first vespers ' +
+        'on the evening before it, a Sunday\'s or feast\'s own second vespers on the day. ' +
         'Psalms include cadence marks for chanting (`chant`).',
       inputSchema: { date: dateArg, language: languageArg },
       annotations: readOnly,
     }),
     tool<{ date?: string | undefined; language?: Language | undefined }>((args, ctx) =>
-      connector.day(args.date, args.language ?? 'fi', ['lectionary'], ctx)),
+      connector.lectionary(args.date, args.language ?? 'fi', ctx)),
   );
 
   server.registerTool(

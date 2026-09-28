@@ -52,7 +52,7 @@ Weekdays use the material of the week's Sunday ("Arkipäivinä käytetään … 
 | `prayers` | array | `{ number, text }` — päivän rukoukset |
 | `hymns` | object | `opening`, `dayHymns`, `additional`, `other` — `{ number, title }` |
 | `propers` | object | `prefaatio`, `kyrieLitania`, `kertosae`, `postCommunionPrayer` (kiitosrukous ehtoollisen jälkeen); `null` where the book gives no seasonal text |
-| `dailyLectionary` | object \| null | The prayer-hour texts of this day on this weekday: morning, midday and evening prayer, day's psalm, and on Sundays and holy days the eve reading, week's psalm and apocrypha. See [daily-lectionary.md](daily-lectionary.md) |
+| `dailyLectionary` | object \| null | The prayer-hour texts of this day on this weekday: morning, midday and evening prayer, day's psalm, and on Sundays and holy days the first vespers, week's psalm and apocrypha. The evening is the next day's first vespers on the evening before a Sunday or feast (Saturday has no vespers of its own), and the day's second vespers on a Sunday or feast. See [daily-lectionary.md](daily-lectionary.md) |
 
 ### Texts
 

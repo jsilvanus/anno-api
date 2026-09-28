@@ -15,6 +15,6 @@ jobs:
           node-version: 22
           cache: npm
       - run: npm ci
-      - run: npm run typecheck -w @anno-api/mcp -w @anno-api/kvk-mcp
+      - run: npm run typecheck -w @anno-api/mcp -w @anno-api/kirkkovuosi-mcp
       - run: npm run build
       - run: npm test

@@ -20,7 +20,7 @@ import {
   type Day,
   type ResolvedDate,
   type DailyLectionary,
-  type PrayerHour,
+  type Vespers,
   type Passage,
 } from '@anno-api/core';
 
@@ -55,15 +55,18 @@ export function validDate(date: string): boolean {
 function lectionaryReferences(l: DailyLectionary | null | undefined): unknown {
   if (!l) return null;
   const refs = (p: Passage[]) => p.map(x => x.reference);
-  const hour = (h: PrayerHour | null) => h && { readings: refs(h.readings), psalms: refs(h.psalms) };
+  const hour = (h: Vespers | null | undefined) => h && {
+    readings: refs(h.readings), psalms: refs(h.psalms), ...(h.vespers ? { vespers: h.vespers, of: h.of?.name } : {}),
+  };
   return {
-    eve: hour(l.eve),
+    firstVespers: hour(l.firstVespers),
     morning: hour(l.morning),
     noon: hour(l.noon),
     evening: hour(l.evening),
     dayPsalm: refs(l.dayPsalm),
     weekPsalm: refs(l.weekPsalm),
     apocrypha: refs(l.apocrypha),
+    ...(l.nextDayFirstVespers ? { nextDayFirstVespers: hour(l.nextDayFirstVespers) } : {}),
   };
 }
 

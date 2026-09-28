@@ -105,11 +105,27 @@ export interface PrayerHour {
   psalms: Passage[];
 }
 
+/** An evening prayer that is a Sunday's or feast's vespers. */
+export interface Vespers extends PrayerHour {
+  /** 'first': the evening before the day (aattoilta); 'second': the day's own evening. */
+  vespers?: 'first' | 'second';
+  /** The Sunday or feast whose vespers these are. */
+  of?: { date: string; slug: string; name: string };
+}
+
 export interface DailyLectionary {
-  eve: PrayerHour | null;
+  /** This Sunday's or feast's first vespers (aattoilta), prayed the evening before. */
+  firstVespers: PrayerHour | null;
   morning: PrayerHour | null;
   noon: PrayerHour | null;
-  evening: PrayerHour | null;
+  /** The evening prayer of this date. The evening before a Sunday or feast is its
+   *  first vespers (Saturday has no vespers of its own); a Sunday's or feast's own
+   *  evening is its second vespers. */
+  evening: Vespers | null;
+  /** When a feast keeps its own second vespers on the evening before another
+   *  Sunday or feast (pyhäinpäivä on a Saturday), or an extra service on the eve:
+   *  the next day's first vespers. */
+  nextDayFirstVespers?: Vespers;
   dayPsalm: Passage[];
   weekPsalm: Passage[];
   apocrypha: Passage[];

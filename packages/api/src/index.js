@@ -62,7 +62,7 @@ export const ENDPOINTS = [
   'GET /api/v1/date/:date/propers — Propers for a date',
   'GET /api/v1/date/:date/color — Liturgical colour for a date',
   'GET /api/v1/date/:date/liturgy — Seasonal rubrics for a date',
-  'GET /api/v1/date/:date/lectionary — Prayer-hour texts of the weekly lectionary (morning, midday, evening, day psalm, eve, apocrypha)',
+  'GET /api/v1/date/:date/lectionary — Prayer-hour texts of the weekly lectionary (morning, midday, evening = first or second vespers, day psalm, apocrypha)',
   'All /today/* and /date/:date/* views: ?day=<slug> picks one of several days on the date (e.g. ?day=paasiaisyo); alsoOnThisDate lists the others',
   'GET /api/v1/holy-day/:slug — Full data for a holy day (?cycle=1|2|3, ?year=YYYY, ?raw=true)',
   'GET /api/v1/year/:year/calendar — Church year calendar starting at Advent of :year',

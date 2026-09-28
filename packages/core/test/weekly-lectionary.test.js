@@ -25,17 +25,44 @@ describe('Weekly lectionary', () => {
     assert.match(l.morning.psalms[0].chant, /\*/, 'psalms carry cadence marks');
   });
 
-  it('gives the Sunday eve reading, week psalm and apocrypha (27.9.2026)', () => {
+  it('gives the Sunday first vespers, week psalm and apocrypha (27.9.2026)', () => {
     const l = resolveDate('2026-09-27').holyDay.dailyLectionary;
-    assert.deepEqual(refs(l.eve.readings), ['Ap. t. 10:9–16']);
+    assert.deepEqual(refs(l.firstVespers.readings), ['Ap. t. 10:9–16']);
     assert.deepEqual(refs(l.weekPsalm), ['Ps. 119:97–104']);
     assert.deepEqual(refs(l.apocrypha), ['Sir. 5:9–6:1']);
-    assert.deepEqual(refs(l.evening.readings), ['Room. 14:1–8']);
   });
 
-  it('reads the next Sunday\'s eve reading on Saturday evening (26.9.2026)', () => {
-    const l = resolveDate('2026-09-26').weekdayMaterial.dailyLectionary;
-    assert.deepEqual(refs(l.evening.readings), ['Ap. t. 10:9–16']);
+  it('prays the Sunday\'s first vespers on Saturday evening and its second vespers on Sunday evening', () => {
+    const sat = resolveDate('2026-09-26').weekdayMaterial.dailyLectionary.evening;
+    assert.equal(sat.vespers, 'first');
+    assert.deepEqual(sat.of, { date: '2026-09-27', slug: '18-sunnuntai-helluntaista', name: '18. sunnuntai helluntaista' });
+    assert.deepEqual(refs(sat.readings), ['Ap. t. 10:9–16']);
+    assert.deepEqual(refs(sat.psalms), ['Ps. 122']);
+    const sun = resolveDate('2026-09-27').holyDay.dailyLectionary.evening;
+    assert.equal(sun.vespers, 'second');
+    assert.equal(sun.of.slug, '18-sunnuntai-helluntaista');
+    assert.deepEqual(refs(sun.readings), ['Room. 14:1–8']);
+  });
+
+  it('takes Saturday\'s first vespers from the next day, not from the week (31.1. and 7.2.2026)', () => {
+    // The week of 3. sunnuntai loppiaisesta is followed by 4. sunnuntai loppiaisesta in
+    // some years; in 2026 by 3. sunnuntai ennen paastonaikaa, and that by kynttilänpäivä
+    const jan31 = resolveDate('2026-01-31').weekdayMaterial.dailyLectionary.evening;
+    assert.equal(jan31.of.slug, '3-sunnuntai-ennen-paastonaikaa');
+    assert.deepEqual(refs(jan31.readings), ['1. Moos. 6:9–22']);
+    const feb7 = resolveDate('2026-02-07').weekdayMaterial.dailyLectionary.evening;
+    assert.equal(feb7.of.slug, 'kynttilanpaiva');
+    assert.deepEqual(refs(feb7.readings), refs(resolveDate('2026-02-08').holyDay.dailyLectionary.firstVespers.readings));
+  });
+
+  it('gives a feast on the Saturday its second vespers and the Sunday\'s first vespers alongside (pyhäinpäivä 31.10.2026)', () => {
+    const l = resolveDate('2026-10-31').holyDay.dailyLectionary;
+    assert.equal(l.evening.vespers, 'second');
+    assert.equal(l.evening.of.slug, 'pyhainpaiva');
+    assert.equal(l.nextDayFirstVespers.vespers, 'first');
+    assert.equal(l.nextDayFirstVespers.of.slug, '23-sunnuntai-helluntaista');
+    // and the Friday evening before is pyhäinpäivä's first vespers
+    assert.equal(resolveDate('2026-10-30').weekdayMaterial.dailyLectionary.evening.of.slug, 'pyhainpaiva');
   });
 
   it('gives each service on Good Friday its own texts', () => {
@@ -67,7 +94,7 @@ describe('Weekly lectionary', () => {
           if (!day || day.type === 'observance') continue;
           const l = day.dailyLectionary;
           if (!l) { problems.push(`${formatDate(d)} ${day.slug}: none`); continue; }
-          const all = [l.eve, l.morning, l.noon, l.evening].filter(Boolean)
+          const all = [l.firstVespers, l.morning, l.noon, l.evening].filter(Boolean)
             .flatMap(h => [...h.readings, ...h.psalms]).concat(l.dayPsalm, l.weekPsalm, l.apocrypha);
           if (!all.length) problems.push(`${formatDate(d)} ${day.slug}: empty`);
           for (const p of all) if (!p.text) problems.push(`${formatDate(d)} ${day.slug}: no text for ${p.reference}`);
@@ -78,16 +105,21 @@ describe('Weekly lectionary', () => {
           if (!l?.morning?.readings.length || !l?.evening?.readings.length) {
             problems.push(`${formatDate(d)} ${r.weekdayMaterial?.slug}: morning/evening reading`);
           }
+          // Saturday has no vespers of its own: its evening is the next day's first vespers
+          const evening = r.weekdayMaterial?.dailyLectionary?.evening;
+          if (dayOfWeek(d) === 6 && (evening?.vespers !== 'first' || evening.of.date !== formatDate(addDays(d, 1)))) {
+            problems.push(`${formatDate(d)}: Saturday evening is not the next day's first vespers`);
+          }
         }
       }
     }
     assert.deepEqual([...new Set(problems)].slice(0, 20), []);
   });
 
-  it('reads the next day\'s eve text on the evening before, also where the site leaves it out', () => {
+  it('gives first vespers also where the site leaves them out', () => {
     // Saturday 3.1.2026: the site gives only the psalm; Sunday 4.1. is 2. sunnuntai joulusta
     const sat = resolveDate('2026-01-03').weekdayMaterial.dailyLectionary.evening;
-    assert.deepEqual(refs(sat.readings), refs(resolveDate('2026-01-04').holyDay.dailyLectionary.eve.readings));
+    assert.deepEqual(refs(sat.readings), refs(resolveDate('2026-01-04').holyDay.dailyLectionary.firstVespers.readings));
     assert.deepEqual(refs(sat.psalms), ['Ps. 122']);
     // Wednesday 5.1.2028, eve of loppiainen: the site has only the psalm; the feast's
     // eve text is 2. Kor. 4:3–6 (on the site only when 6.1. is a Sunday)

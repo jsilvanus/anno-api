@@ -1,6 +1,6 @@
 ---
 name: kirkkovuosikalenteri-api
-description: Fetch the texts of the Finnish Lutheran church year (Sunday readings of all three year cycles, psalm, hallelujah verse, prayers, hymns, altar candles, the weekly lectionary's prayer-hour texts, liturgical colours) from the public JSON API of kirkkovuosikalenteri.fi / kyrkoarskalendern.fi. Use when an answer needs the actual Bible or prayer texts for a date and neither the anno-api MCP tools nor the kvk-mcp tools are available.
+description: Fetch the texts of the Finnish Lutheran church year (Sunday readings of all three year cycles, psalm, hallelujah verse, prayers, hymns, altar candles, the weekly lectionary's prayer-hour texts, liturgical colours) from the public JSON API of kirkkovuosikalenteri.fi / kyrkoarskalendern.fi. Use when an answer needs the actual Bible or prayer texts for a date and neither the anno-api MCP tools nor the kirkkovuosi-mcp tools are available.
 ---
 
 # Kirkkovuosikalenteri public API
@@ -9,7 +9,7 @@ Kirkkovuosikalenteri (https://www.kirkkovuosikalenteri.fi) is the church-year ca
 
 Prefer, in this order:
 1. The anno-api MCP tools (`church_day`, `daily_lectionary`, …) or REST API (`/api/v1/date/:date`) — same texts, plus propers and rubrics, no network dependency.
-2. The kvk-mcp tools (`kvk_day`, `kvk_lectionary`, `kvk_liturgical_colors`, `kvk_search`) — this API already cleaned up (HTML removed, cycles named).
+2. The kirkkovuosi-mcp tools (`kvk_day`, `kvk_lectionary`, `kvk_liturgical_colors`, `kvk_search`) — this API already cleaned up (HTML removed, cycles named).
 3. This API directly, as described below.
 
 ## Endpoints
@@ -83,13 +83,15 @@ Each key is `false` or an array of `{ verse, text }` (reference + HTML text). Th
 |---|---|---|
 | `morning` | Morning prayer: `[reading, psalm]` | `[psalm]` |
 | `noon` | Midday prayer: `[psalm]` | `[psalm]` |
-| `evening` | Evening prayer: `[reading, psalm]`; on **Saturday** these are the coming Sunday's eve texts | `[reading, psalm]` |
+| `evening` | Evening prayer: `[reading, psalm]`; on **Saturday** meant as the coming Sunday's first vespers (see below) | The Sunday's second vespers: `[reading, psalm]` |
 | `psalms` | The day's psalm (varies with season and weekday) | The day's psalm |
-| `eve` | `false` | Eve (aatto) reading + psalm, i.e. the preceding Saturday evening's texts |
+| `eve` | `false` | The Sunday's or feast's first vespers (aattoilta): reading + psalm, prayed the evening before |
 | `week` | Usually `false` | The week's psalm |
 | `apocrypha` | Usually `false` | Reading from the Apocrypha (e.g. Sir.) |
 
-Tell readings from psalms by the reference: psalms start with `Ps. `. The hour psalms of `morning`/`noon`/`evening` are fixed per weekday; the readings follow the week's holy day.
+**Vespers.** Saturday has no vespers of its own: Saturday evening is the coming Sunday's first vespers, and the Sunday's own `evening` is its second vespers. The site stores Saturday's `evening` with the *week*, so in years where the week is followed by a different Sunday or feast (kynttilänpäivä, Marian ilmestyspäivä, mikkelinpäivä, pyhäinpäivä, or a Sunday dropped at the end of Epiphany or of the church year) it gives the wrong texts. For the evening before a Sunday or feast, fetch the **next date** and use its `eve`. Some feasts have `eve` only in the years they fall on a Sunday (loppiainen: 2. Kor. 4:3–6); the eve is the feast's own, so any year's `eve` of that feast will do.
+
+An hour lists its reading(s) first and its psalm last. Some hours have two readings (a biblical one and one from the Apocrypha), and a reading can itself be from the Psalms, so go by position. The site writes a few psalm references without `Ps.` (`147:1–11`). The hour psalms of `morning`/`noon`/`evening` are fixed per weekday; the readings follow the week's holy day.
 
 ### Text formatting
 

@@ -99,8 +99,10 @@ export function createMcpServer(options: McpServerOptions): McpServer {
     withOAuthSecurity({
       title: 'Daily prayer texts (viikkolektionaari)',
       description: 'The weekly lectionary for a date, with full texts: the morning and evening reading, the psalms of the morning, ' +
-        'midday and evening prayer, the day\'s psalm, and on Sundays and holy days the week\'s psalm, the eve reading and the ' +
-        'week\'s apocrypha text. Weekday readings follow the preceding Sunday. Psalms also come with cadence marks for chanting.',
+        'midday and evening prayer, the day\'s psalm, and on Sundays and holy days the week\'s psalm, the first vespers (aattoilta) and the ' +
+        'week\'s apocrypha text. Weekday readings follow the preceding Sunday. Saturday has no vespers of its own: the evening before ' +
+        'a Sunday or feast is its first vespers, and a Sunday\'s own evening its second vespers (evening.vespers, evening.of). ' +
+        'Psalms also come with cadence marks for chanting.',
       inputSchema: { date: dateArg },
       annotations: readOnly,
     }),

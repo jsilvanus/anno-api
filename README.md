@@ -13,7 +13,7 @@ Sources: Evankeliumikirja (2021), Jumalanpalvelusten kirja (2000) and the weekly
 | [`packages/core`](packages/core) — `@anno-api/core` | Calendar computation, date resolution and the data. Zero dependencies. |
 | [`packages/api`](packages/api) — `@anno-api/api` | REST API, zero-dependency HTTP server. [Endpoints](docs/README.md) |
 | [`packages/mcp`](packages/mcp) — `@anno-api/mcp` | MCP server (Streamable HTTP) with an embedded OAuth server; sign-in and registration on the OAuth page. [Tools](docs/mcp.md) |
-| [`packages/kvk-mcp`](packages/kvk-mcp) — `@anno-api/kvk-mcp` | MCP server wrapping the live API of kirkkovuosikalenteri.fi (Finnish and Swedish). [Tools](packages/kvk-mcp/README.md) |
+| [`packages/kirkkovuosi-mcp`](packages/kirkkovuosi-mcp) — `@anno-api/kirkkovuosi-mcp` | MCP server wrapping the live API of kirkkovuosikalenteri.fi (Finnish and Swedish). [Tools](packages/kirkkovuosi-mcp/README.md) |
 
 For an AI without these servers, [`.claude/skills/kirkkovuosikalenteri-api/SKILL.md`](.claude/skills/kirkkovuosikalenteri-api/SKILL.md) is an instruction for using kirkkovuosikalenteri.fi's public API directly: endpoints, date format, coverage and every field of the response. It works as a Claude Code skill or pasted into any system prompt.
 

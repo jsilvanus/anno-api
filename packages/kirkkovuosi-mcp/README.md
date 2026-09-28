@@ -11,7 +11,7 @@ All read-only.
 | Tool | Arguments | Returns |
 |---|---|---|
 | `kvk_day` | `date?`, `language?` (`fi`/`sv`), `sections?` (`texts`, `lectionary`, `prayers`, `hymns`) | Everything for a date: holy day(s) or on a weekday the preceding Sunday, period, colour, altar candles, description; Bible texts of all three year cycles with the active one; psalm and hallelujah verse; weekly lectionary; prayers; hymns |
-| `kvk_lectionary` | `date?`, `language?` | The weekly lectionary: eve, morning, noon and evening prayer, day psalm, week psalm, apocrypha — psalms with cadence marks (`chant`) |
+| `kvk_lectionary` | `date?`, `language?` | The weekly lectionary: first vespers, morning, noon and evening prayer, day psalm, week psalm, apocrypha — psalms with cadence marks (`chant`). `tonight` is the evening prayer to use: the next Sunday's or feast's first vespers on the evening before it (Saturday has no vespers of its own; the site files Saturday evening under the week, which is wrong in some years), the day's own second vespers on a Sunday or feast |
 | `kvk_liturgical_colors` | `year`, `month` | The colour(s) of every day of a month (two on Holy Saturday); `marked` where the site's calendar view highlights a day (undocumented) |
 | `kvk_search` | `query`, `language?` | Holy days and pages by name |
 
@@ -31,10 +31,10 @@ Texts © Kirkkohallitus; Bible texts Raamattu (1992) © Kirkkohallitus.
 
     cp .env.example .env    # set MCP_PUBLIC_URL, JWT_SECRET and the default user
     npm install             # in the repository root (npm workspaces)
-    npm run build -w @anno-api/kvk-mcp
-    npm run start:kvk-mcp   # from the repository root
+    npm run build -w @anno-api/kirkkovuosi-mcp
+    npm run start:kirkkovuosi-mcp   # from the repository root
 
-    npm test -w @anno-api/kvk-mcp   # connector tests use saved responses (no network) + OAuth end to end
+    npm test -w @anno-api/kirkkovuosi-mcp   # connector tests use saved responses (no network) + OAuth end to end
 
 ## Modern baseline
 

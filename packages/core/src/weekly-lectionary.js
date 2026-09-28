@@ -7,9 +7,13 @@
  * Each day of the week has a morning and an evening reading (weekday readings
  * follow the preceding Sunday's texts), the psalms of the morning, midday and
  * evening prayer (fixed by weekday and hour), the day's psalm (by season and
- * weekday), and on Sundays and holy days the week's psalm, the eve reading
- * (aattoilta) and the week's apocrypha text. Saturday evening has the next
- * Sunday's eve reading.
+ * weekday), and on Sundays and holy days the week's psalm, the first vespers
+ * (aattoilta, prayed the evening before) and the week's apocrypha text.
+ *
+ * Saturday has no vespers of its own: its evening is the coming Sunday's first
+ * vespers, and a Sunday's evening prayer is its second vespers. Which day the
+ * evening belongs to depends on the next day, so resolveDate() sets `evening`
+ * (see resolver.js); dailyLectionary() gives the texts stored for the day.
  */
 
 import { readFileSync } from 'fs';
@@ -72,13 +76,13 @@ function rawEntry(slug, weekday) {
  *
  * @param {string} slug — the holy day, or on a weekday the day whose material is used
  * @param {number} weekday — 0 = sunnuntai … 6 = lauantai
- * @returns {{ eve, morning, noon, evening, dayPsalm, weekPsalm, apocrypha } | null}
+ * @returns {{ firstVespers, morning, noon, evening, dayPsalm, weekPsalm, apocrypha } | null}
  */
 export function dailyLectionary(slug, weekday) {
   const entry = rawEntry(slug, weekday);
   if (!entry) return null;
   return {
-    eve: hour(entry.eve),
+    firstVespers: hour(entry.eve),
     morning: hour(entry.morning),
     noon: hour(entry.noon),
     evening: hour(entry.evening),
