@@ -7,7 +7,8 @@
   "workspaces": [
     "packages/core",
     "packages/api",
-    "packages/mcp"
+    "packages/mcp",
+    "packages/kvk-mcp"
   ],
   "scripts": {
     "start": "npm start -w @anno-api/api",
@@ -15,11 +16,20 @@
     "start:mcp": "npm start -w @anno-api/mcp",
     "dev:mcp": "npm run dev -w @anno-api/mcp",
     "build": "npm run build --workspaces --if-present",
-    "test": "npm test --workspaces --if-present"
+    "test": "npm test --workspaces --if-present",
+    "start:kvk-mcp": "npm start -w @anno-api/kvk-mcp",
+    "dev:kvk-mcp": "npm run dev -w @anno-api/kvk-mcp"
   },
   "engines": {
     "node": ">=22.5"
   },
-  "keywords": ["kirkkovuosi", "church-year", "lectionary", "lutheran", "finland", "mcp"],
+  "keywords": [
+    "kirkkovuosi",
+    "church-year",
+    "lectionary",
+    "lutheran",
+    "finland",
+    "mcp"
+  ],
   "license": "ISC"
 }
