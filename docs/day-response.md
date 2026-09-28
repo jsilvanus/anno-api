@@ -80,12 +80,13 @@ Weekdays use the material of the week's Sunday ("Arkipäivinä käytetään … 
 
 ## Liturgy
 
-Seasonal rubrics from Jumalanpalvelusten kirja (2000):
+Rubrics of the Mass. The top-level `liturgy` is that of the day's main service; every day and service in the response (`holyDay`, each of `additionalServices`, `weekdayMaterial`) also carries its own `liturgy`. On Holy Saturday, for example, hiljainen lauantai and pääsiäisyö differ.
 
 | Field | Rule |
 |---|---|
-| `gloria` | Kunnia ja kiitosvirsi is omitted in Advent (from the Monday after 1st Advent) and Lent (from Ash Wednesday); the Maundy Thursday Mass keeps it |
-| `hallelujah` | Omitted in Lent from Ash Wednesday |
-| `psalmVerseInsteadOfHallelujah` | The psalm verse (`psalmVerse`) may be used instead |
-| `gloriaPatri` | Pieni kunnia is omitted from 5. paastonajan sunnuntai |
+| `gloria` | Kunnia ja kiitosvirsi is omitted in Advent (from the Monday after 1st Advent) and Lent (from Ash Wednesday). Kept on kiirastorstai, on Marian ilmestyspäivä (also in Passiontide) and at pääsiäisyö |
+| `hallelujah` | Follows what Evankeliumikirja prints for the day: a hallelujah verse means it is sung, a psalm verse (psalmilause) means it is omitted. So Marian ilmestyspäivä keeps its hallelujah in Lent. Days that print neither follow the seasonal rule (omitted from Ash Wednesday) |
+| `psalmVerseInsteadOfHallelujah` | The psalm verse (`psalmVerse`) is used instead of the hallelujah |
+| `gloriaPatri` | Follows the day's psalm (`psalm.gloriaPatri`): Pieni kunnia is omitted from 5. paastonajan sunnuntai, except on Marian ilmestyspäivä; otherwise the seasonal rule |
 | `notes` | The rubrics that apply, in Finnish |
+| `source` | Jumalanpalvelusten kirja (2000) and Evankeliumikirja (2021) |

@@ -79,6 +79,7 @@ function referencesOnly(day: Day | null): unknown {
     psalm: day.psalm && { reference: day.psalm.reference, antiphonReference: day.psalm.antiphonReference },
     hallelujah: day.hallelujah && { reference: day.hallelujah.reference, text: day.hallelujah.text },
     psalmVerse: day.psalmVerse && { reference: day.psalmVerse.reference, text: day.psalmVerse.text },
+    liturgy: day.liturgy ?? null,
     prayerCount: day.prayers.length,
     hymns: day.hymns,
     propers: {

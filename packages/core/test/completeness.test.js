@@ -110,9 +110,48 @@ describe('Liturgical rubrics', () => {
     assert.equal(resolveDate('2026-04-05').liturgy.hallelujah, true);
   });
 
+  it('keeps Gloria, hallelujah and Gloria Patri on Marian ilmestyspäivä in every Lent week (2021–2030)', () => {
+    for (let year = 2021; year <= 2030; year++) {
+      const entry = generateChurchYear(year).find(e => e.slug === 'marian-ilmestyspaiva');
+      const r = resolveDate(entry.dateStr);
+      assert.equal(r.holyDay.slug, 'marian-ilmestyspaiva');
+      assert.ok(r.holyDay.hallelujah?.text, `${entry.dateStr}: hallelujah verse`);
+      assert.deepEqual(
+        { gloria: r.liturgy.gloria, hallelujah: r.liturgy.hallelujah, gloriaPatri: r.liturgy.gloriaPatri },
+        { gloria: true, hallelujah: true, gloriaPatri: true },
+        entry.dateStr,
+      );
+    }
+  });
+
+  it('gives the Easter Vigil its own rubrics on Holy Saturday', () => {
+    const r = resolveDate('2026-04-04');
+    assert.equal(r.holyDay.slug, 'hiljainen-lauantai');
+    assert.deepEqual([r.liturgy.gloria, r.liturgy.hallelujah, r.liturgy.gloriaPatri], [false, false, false]);
+    const vigil = r.additionalServices.find(d => d.slug === 'paasiaisyo');
+    assert.deepEqual([vigil.liturgy.gloria, vigil.liturgy.hallelujah, vigil.liturgy.gloriaPatri], [true, true, true]);
+  });
+
+  it('follows the hallelujah verse / psalm verse and Gloria Patri printed for each day (2021–2030)', () => {
+    const problems = [];
+    for (let year = 2021; year <= 2030; year++) {
+      for (const e of generateChurchYear(year)) {
+        if (e.type === 'weekday' || e.type === 'observance') continue;
+        const r = resolveDate(e.dateStr, { allYearCycles: false });
+        const day = [r.holyDay, ...r.additionalServices].find(d => d.slug === e.slug);
+        if (day.hallelujah && !day.liturgy.hallelujah) problems.push(`${e.dateStr} ${e.slug}: hallelujah printed but omitted`);
+        if (day.psalmVerse && !day.hallelujah && day.liturgy.hallelujah) problems.push(`${e.dateStr} ${e.slug}: psalm verse printed but hallelujah sung`);
+        if (typeof day.psalm?.gloriaPatri === 'boolean' && day.psalm.gloriaPatri !== day.liturgy.gloriaPatri) problems.push(`${e.dateStr} ${e.slug}: Gloria Patri`);
+      }
+    }
+    assert.deepEqual(problems, []);
+  });
+
   it('omits Gloria Patri from 5. paastonajan sunnuntai', () => {
     assert.equal(resolveDate('2026-03-15').liturgy.gloriaPatri, true);
-    assert.equal(resolveDate('2026-03-22').liturgy.gloriaPatri, false);
+    assert.equal(resolveDate('2028-04-02').liturgy.gloriaPatri, false); // 5. paastonajan sunnuntai
+    assert.equal(resolveDate('2026-03-24').liturgy.gloriaPatri, false); // weekday with Judica material
+    assert.equal(resolveDate('2026-03-29').liturgy.gloriaPatri, false); // Palmusunnuntai
   });
 });
 

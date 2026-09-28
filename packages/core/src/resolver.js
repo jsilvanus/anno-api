@@ -223,7 +223,8 @@ function enrichEntry(entry, yearCycle, { weekday = false, allYearCycles = true }
  *   texts, prayers and colour are used (the week's Sunday, even when a feast
  *   took its place; see weekdayMaterialSlug)
  * - `liturgicalColor`: the colour of the day
- * - `liturgy`: seasonal rubrics (Gloria, Hallelujah, Gloria Patri)
+ * - `liturgy`: rubrics of the day's main service (Gloria, Hallelujah, Gloria Patri);
+ *   every day and service in the response also carries its own `liturgy`
  *
  * @param {Date|string} date - Date object or YYYY-MM-DD string
  * @param {object} [options]
@@ -269,6 +270,11 @@ export function resolveDate(date, { allYearCycles = true } = {}) {
     }
   }
 
+  // Rubrics per day and service: pääsiäisyö on Holy Saturday differs from the day itself
+  for (const d of [holyDay, ...additionalServices, weekdayMaterial]) {
+    if (d) d.liturgy = liturgicalRules(date, calendar, d);
+  }
+
   const day = holyDay ?? weekdayMaterial;
   const seasonSource = holyDay ?? weekdayMaterial;
 
@@ -284,7 +290,8 @@ export function resolveDate(date, { allYearCycles = true } = {}) {
     // Kept for backward compatibility: the day whose material a weekday uses
     precedingSunday: weekdayMaterial && { name: weekdayMaterial.name, slug: weekdayMaterial.slug, date: weekdayMaterial.date },
     liturgicalColor: day?.liturgicalColor ?? null,
-    liturgy: liturgicalRules(date, calendar, day),
+    // Rubrics of the day's main service; each day and service also carries its own
+    liturgy: day?.liturgy ?? liturgicalRules(date, calendar, null),
   };
 }
 
@@ -306,11 +313,12 @@ export function getHolyDay(slug, { yearCycle = null, churchYear = null } = {}) {
   if (!data) return null;
   const start = churchYear ?? getChurchYearStart(new Date());
   const cycle = yearCycle ?? getYearCycle(start);
-  const entry = getCalendar(start).find(e => e.slug === slug);
-  return {
-    ...enrichEntry({ slug, name: data.name, type: entry?.type ?? null, dateStr: entry?.dateStr ?? null, replaces: entry?.replaces }, cycle),
-    churchYear: churchYearInfo(start),
-  };
+  const calendar = getCalendar(start);
+  const entry = calendar.find(e => e.slug === slug);
+  const day = enrichEntry({ slug, name: data.name, type: entry?.type ?? null, dateStr: entry?.dateStr ?? null, replaces: entry?.replaces }, cycle);
+  // Rubrics apply to a dated day; weekday-material entries (e.g. 26. sunnuntai helluntaista in a short year) have none
+  day.liturgy = entry ? liturgicalRules(entry.date, calendar, day) : null;
+  return { ...day, churchYear: churchYearInfo(start) };
 }
 
 // ─── Calendar Year Queries ──────────────────────────────────────────────────

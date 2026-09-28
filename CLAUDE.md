@@ -51,6 +51,7 @@ packages/
 - **Church year** starts on 1st Advent Sunday (Sunday Nov 27 – Dec 3). **Year cycle** = `((start + 1) % 3) + 1` — 2025–2026 is the 2nd vuosikerta (per evl.fi).
 - **Calendar entries** have a `type` (`sunday`, `feast`, `day`, `service`, `observance`, `weekday`). Sundays carry `sundaySlug`; a feast that takes a Sunday's place (kynttilänpäivä, Marian ilmestyspäivä, mikkelinpäivä, Dec 26–28) carries `replaces`. Weekdays use the displaced Sunday's material (`weekdayMaterialSlug`).
 - **The official perikooppikalenterit are ground truth.** `test/perikooppikalenteri.test.js` checks every date, name, reading, psalm and hallelujah verse for 2021–2029. Any calendar or data change must keep it green. Add a year by dropping `kvYYYY.doc` into `refs/perikooppikalenterit/` and running `npm run parse:perikooppikalenterit -w @anno-api/core`.
+- **Rubrics** (`liturgy`) are computed per day or service and follow what Evankeliumikirja prints (hallelujasäe vs psalmilause, `psalm.gloriaPatri`); Gloria is kept on kiirastorstai, Marian ilmestyspäivä and pääsiäisyö. See `src/rules.js`.
 - **"Today"** is computed in Finnish time (`todayInFinland()`), not UTC.
 - **MCP auth:** every `/mcp` request needs a bearer token (401 + `WWW-Authenticate` otherwise). The OAuth sign-in page is the only web UI; it also has the registration form. Read `packages/mcp/LEARNED.md` before changing OAuth plumbing.
 

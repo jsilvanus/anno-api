@@ -52,7 +52,8 @@ function textsView(date, query) {
     yearCycle,
     texts,
     psalm: day?.psalm ?? null,
-    hallelujah: resolved.liturgy.hallelujah ? day?.hallelujah ?? null : null,
+    hallelujah: day?.hallelujah ?? null,
+    liturgy: day?.liturgy ?? resolved.liturgy,
     psalmVerse: day?.psalmVerse ?? null,
   };
 }

@@ -86,6 +86,8 @@ export interface Day {
   hymns: Record<string, { number: string; title: string }[]> | null;
   propers: Propers;
   weeklyLectionary: unknown[];
+  /** Rubrics of this day or service (null for an undated holy day lookup). */
+  liturgy?: Liturgy | null;
 }
 
 export interface ChurchYear {

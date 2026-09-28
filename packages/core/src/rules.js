@@ -9,18 +9,31 @@
  *   "Pieni kunnia jätetään pois paastonaikana 5. paastonajan sunnuntaista
  *    lähtien."
  *
- * The Maundy Thursday Mass (Kiirastorstain messu) includes the Gloria. Lent
- * lasts until the Easter Vigil (pääsiäisyö), where Gloria and Hallelujah return.
+ * The rubrics are worked out per day or service, not per date:
+ *
+ * - Hallelujah and Gloria Patri follow what Evankeliumikirja prints for the
+ *   day: a hallelujah verse (hallelujasäe) or a psalm verse (psalmilause), and
+ *   the psalm with or without Gloria Patri. The seasonal rule is only the
+ *   fallback for material that prints neither.
+ * - Feasts keep the Gloria in Lent: the Maundy Thursday Mass (Kiirastorstain
+ *   messu), Marian ilmestyspäivä (also in Passiontide) and the Easter Vigil
+ *   (pääsiäisyö), where Gloria and Hallelujah return.
  */
 
 import { addDays, easterSunday, sameDay } from './computus.js';
 
-const SOURCE = 'Jumalanpalvelusten kirja (Kirkkokäsikirja I, 2000)';
+const SOURCE = 'Jumalanpalvelusten kirja (Kirkkokäsikirja I, 2000); Evankeliumikirja (2021)';
+
+/** Days that keep the Gloria in Advent or Lent. (The Easter Vigil is outside Lent below.) */
+const GLORIA_KEPT = {
+  'kiirastorstai': 'Kiirastorstain messussa lauletaan Kunnia ja kiitosvirsi.',
+  'marian-ilmestyspaiva': 'Marian ilmestyspäivänä lauletaan Kunnia ja kiitosvirsi myös paastonaikana.',
+};
 
 /**
  * @param {Date} date
  * @param {Array} calendar — generateChurchYear output for the date's church year
- * @param {object|null} day — the enriched day (holy day or weekday material)
+ * @param {object|null} day — the enriched day or service (holy day or weekday material)
  */
 export function liturgicalRules(date, calendar, day) {
   const advent1 = calendar[0].date;
@@ -29,27 +42,37 @@ export function liturgicalRules(date, calendar, day) {
   const judica = addDays(easter, -14);
   const holySaturday = addDays(easter, -1);
   const christmasEve = new Date(Date.UTC(advent1.getUTCFullYear(), 11, 24));
+  const slug = day?.slug;
+  const easterVigil = slug === 'paasiaisyo';
 
-  const inAdvent = date > advent1 && (date < christmasEve || (sameDay(date, christmasEve) && day?.slug === '4-adventtisunnuntai'));
-  const inLent = date >= ashWednesday && date <= holySaturday;
-  const maundyThursday = sameDay(date, addDays(easter, -3));
-  const passiontide = date >= judica && date <= holySaturday;
-
-  const gloria = !((inAdvent || inLent) && !maundyThursday);
-  const hallelujah = !inLent;
+  const inAdvent = date > advent1 && (date < christmasEve || (sameDay(date, christmasEve) && slug === '4-adventtisunnuntai'));
+  const inLent = date >= ashWednesday && date <= holySaturday && !easterVigil;
+  const passiontide = date >= judica && date <= holySaturday && !easterVigil;
   const notes = [];
-  if (inAdvent) notes.push('Kunnia ja kiitosvirsi jätetään pois adventtiaikana (1. adventtisunnuntain jälkeisestä maanantaista lähtien).');
-  if (inLent && !maundyThursday) notes.push('Kunnia ja kiitosvirsi jätetään pois paastonaikana (tuhkakeskiviikosta lähtien).');
-  if (maundyThursday) notes.push('Kiirastorstain messussa lauletaan Kunnia ja kiitosvirsi.');
-  if (inLent) notes.push('Halleluja jätetään pois paastonaikana tuhkakeskiviikosta lähtien. Hallelujalaulun sijasta voidaan käyttää psalmilausetta.');
-  if (passiontide) notes.push('Pieni kunnia jätetään pois paastonaikana 5. paastonajan sunnuntaista lähtien.');
-  if (sameDay(date, holySaturday)) notes.push('Pääsiäisyön messussa Kunnia ja halleluja lauletaan jälleen.');
+
+  // Gloria: seasonal rule with the feasts that keep it
+  const gloriaKept = (inAdvent || inLent) && GLORIA_KEPT[slug];
+  const gloria = !(inAdvent || inLent) || Boolean(gloriaKept);
+  if (gloriaKept) notes.push(GLORIA_KEPT[slug]);
+  else if (inAdvent) notes.push('Kunnia ja kiitosvirsi jätetään pois adventtiaikana (1. adventtisunnuntain jälkeisestä maanantaista lähtien).');
+  else if (inLent) notes.push('Kunnia ja kiitosvirsi jätetään pois paastonaikana (tuhkakeskiviikosta lähtien).');
+  if (easterVigil) notes.push('Pääsiäisyön messussa Kunnia ja kiitosvirsi sekä halleluja lauletaan jälleen.');
+
+  // Hallelujah: what the book prints for the day, else the seasonal rule
+  const hallelujah = day?.hallelujah ? true : day?.psalmVerse ? false : !inLent;
+  if (!hallelujah) notes.push('Halleluja jätetään pois paastonaikana tuhkakeskiviikosta lähtien. Hallelujalaulun sijasta voidaan käyttää psalmilausetta.');
+  else if (inLent && day?.hallelujah) notes.push(`${day.name}: hallelujasäe lauletaan myös paastonaikana.`);
+
+  // Gloria Patri: as printed with the day's psalm, else the seasonal rule
+  const gloriaPatri = typeof day?.psalm?.gloriaPatri === 'boolean' ? day.psalm.gloriaPatri : !passiontide;
+  if (!gloriaPatri) notes.push('Pieni kunnia jätetään pois paastonaikana 5. paastonajan sunnuntaista lähtien.');
+  else if (passiontide) notes.push(`${day.name}: psalmiin liitetään pieni kunnia myös kärsimysaikana.`);
 
   return {
     gloria,
     hallelujah,
     psalmVerseInsteadOfHallelujah: !hallelujah,
-    gloriaPatri: !passiontide,
+    gloriaPatri,
     notes,
     source: SOURCE,
   };
