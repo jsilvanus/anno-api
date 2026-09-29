@@ -46,7 +46,7 @@ packages/
 
 ## Key design points
 
-- **core and api have no external dependencies.** Only Node.js built-ins. The MCP package has its own dependencies (fastify, MCP SDK, jose, argon2, zod).
+- **core and api have no external dependencies.** Only Node.js built-ins. The MCP package has its own dependencies (fastify, MCP SDK, jose, argon2, zod, openid-client).
 - **Data is loaded lazily and cached.** Each core module has a module-level cache initialised on first call. Data directory: `join(__dirname, '..', 'data')`.
 - **Router** in `packages/api/src/index.js` converts `:param` patterns to regex. Handlers receive `{ params, query }`; returning `{ error, status? }` sends that status (default 400).
 - **Church year** starts on 1st Advent Sunday (Sunday Nov 27 – Dec 3). **Year cycle** = `((start + 1) % 3) + 1` — 2025–2026 is the 2nd vuosikerta (per evl.fi).
@@ -54,7 +54,7 @@ packages/
 - **The official perikooppikalenterit are ground truth.** `test/perikooppikalenteri.test.js` checks every date, name, reading, psalm and hallelujah verse for 2021–2029. Any calendar or data change must keep it green. Add a year by dropping `kvYYYY.doc` into `refs/perikooppikalenterit/` and running `npm run parse:perikooppikalenterit -w @anno-api/core`.
 - **Rubrics** (`liturgy`) are computed per day or service and follow what Evankeliumikirja prints (hallelujasäe vs psalmilause, `psalm.gloriaPatri`); Gloria is kept on kiirastorstai, Marian ilmestyspäivä and pääsiäisyö. See `src/rules.js`.
 - **"Today"** is computed in Finnish time (`todayInFinland()`), not UTC.
-- **MCP auth:** every `/mcp` request needs a bearer token (401 + `WWW-Authenticate` otherwise). The OAuth sign-in page is the only web UI; it also has the registration form. Read `packages/mcp/LEARNED.md` before changing OAuth plumbing.
+- **MCP auth:** every `/mcp` request needs a bearer token (401 + `WWW-Authenticate` otherwise). The OAuth sign-in page is the only web UI; it also has the registration form and, when `OIDC_ISSUER` is set, a single sign-on button (OIDC Relying Party, `src/oauth/oidc.ts`, `/oidc/login` + `/oidc/callback`; see `docs/mcp.md`). Read `packages/mcp/LEARNED.md` before changing OAuth plumbing.
 
 ## kirkkovuosikalenteri.fi API
 

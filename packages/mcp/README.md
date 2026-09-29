@@ -10,6 +10,7 @@ Built from the Codestash scaffold `mcp/api-connector-style` (jsilvanus/codestash
 - `src/mcp/server.ts` — church year tools, server instructions, read-only tool annotations
 - `src/app.ts` — `buildApp()` builds the Fastify app; `src/server.ts` reads the environment and listens (the tests use `buildApp()`)
 - `src/oauth/authorization-server.ts` — registration form on the sign-in page (`POST /oauth/register`), a signed login ticket between sign-in and consent, per-IP rate limiting, Finnish pages, refresh tokens of deleted users are refused
+- `src/oauth/oidc.ts` — optional single sign-on: the server is an OIDC Relying Party of an external provider (e.g. authentik, `openid-client`), enabled by `OIDC_ISSUER`; the SSO button on the sign-in page leads to the same consent step. See [`docs/mcp.md`](../../docs/mcp.md#single-sign-on-oidc)
 - The bootstrap account is optional (`MCP_DEFAULT_USER_EMAIL` + `MCP_DEFAULT_USER_PASSWORD`), since users can register
 
 ## Modern baseline
@@ -96,6 +97,7 @@ When MCP_DEFAULT_USER_EMAIL and MCP_DEFAULT_USER_PASSWORD are set, that account 
     /oauth/authorize
         |
         +--> sign-in (email + password)  or  register (/oauth/register)
+        |    or  single sign-on (/oidc/login -> provider -> /oidc/callback, when OIDC_ISSUER is set)
         |
         +--> consent (approve / deny)
         |

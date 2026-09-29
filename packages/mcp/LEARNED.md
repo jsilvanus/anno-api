@@ -91,6 +91,10 @@ The scaffold's consent form posted only `oauth` and `action`, but `POST /oauth/a
 
 Registration lives on the OAuth sign-in page itself (a `<details>` section, no JavaScript: the CSP is `default-src 'none'`). `POST /oauth/register` validates the authorization request like `/oauth/authorize`, creates the user (Argon2id) and goes straight to consent with a login ticket. Open by default; `MCP_REGISTRATION=closed` or an e-mail domain allowlist restrict it. E-mail addresses are stored lower-case (look-ups were already case-insensitive). Failed sign-ins and registrations are rate limited per IP in memory; behind a proxy set `TRUST_PROXY` so `request.ip` is the client.
 
+## OIDC sign-in (anno-api)
+
+With `OIDC_ISSUER` set, the sign-in page also shows an SSO button (a plain link, so the CSP `form-action` is untouched) to `/oidc/login?oauth=…`. The server is an OIDC **Relying Party** only (`openid-client` v6): no JWKS, no ID tokens of its own, `.well-known` unchanged. Pending sign-ins live in SQLite under SHA-256(state), single use, 10 minutes; an `anno_oidc` cookie (Path=/oidc, SameSite=Lax) must carry the same state back (login CSRF). After the identity is mapped to a local user (`oidc_identities`, then verified e-mail, then optional creation), `/oidc/callback` renders the normal consent page with a login ticket, so approve/deny and the CSP `form-action` for the client's redirect are the same code as for passwords. openid-client sends `client_secret_basic` form-urlencoded before base64 (RFC 6749 §2.3.1): a fake provider must decode it. Tests: `test/fake-oidc-provider.ts`.
+
 ## Testing the OAuth flow without a CIMD host
 
 `mountAuthorizationServer` takes `fetchClientMetadata` in its options so tests can stub the CIMD fetch (the real one needs a public HTTPS host). `test/oauth-mcp.test.ts` runs sign-up → consent → PKCE token exchange → `/mcp` against an ephemeral port.

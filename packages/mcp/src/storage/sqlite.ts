@@ -1,7 +1,7 @@
 import { mkdirSync } from 'node:fs';
 import { dirname } from 'node:path';
 import { DatabaseSync } from 'node:sqlite';
-import type { AuthStore, AuthorizationCodeRecord, RefreshTokenRecord, McpUser, UserStore } from './interface.js';
+import type { AuthStore, AuthorizationCodeRecord, OidcStateRecord, RefreshTokenRecord, McpUser, UserStore } from './interface.js';
 
 export class SqliteAuthStore implements AuthStore {
   private readonly db: DatabaseSync;
@@ -12,7 +12,8 @@ export class SqliteAuthStore implements AuthStore {
     this.db.exec(
       'CREATE TABLE IF NOT EXISTS users (id TEXT PRIMARY KEY, name TEXT NOT NULL, email TEXT UNIQUE, password_hash TEXT, created_at INTEGER NOT NULL);' +
       'CREATE TABLE IF NOT EXISTS authorization_codes (code TEXT PRIMARY KEY, client_id TEXT NOT NULL, redirect_uri TEXT NOT NULL, challenge TEXT NOT NULL, subject TEXT NOT NULL, scope TEXT NOT NULL, expires INTEGER NOT NULL);' +
-      'CREATE TABLE IF NOT EXISTS refresh_tokens (token TEXT PRIMARY KEY, client_id TEXT NOT NULL, subject TEXT NOT NULL, scope TEXT NOT NULL, expires INTEGER NOT NULL);'
+      'CREATE TABLE IF NOT EXISTS refresh_tokens (token TEXT PRIMARY KEY, client_id TEXT NOT NULL, subject TEXT NOT NULL, scope TEXT NOT NULL, expires INTEGER NOT NULL);' +
+      'CREATE TABLE IF NOT EXISTS oidc_states (state_hash TEXT PRIMARY KEY, code_verifier TEXT NOT NULL, nonce TEXT NOT NULL, purpose TEXT NOT NULL, oauth TEXT NOT NULL, expires INTEGER NOT NULL);'
     );
     try { this.db.exec('ALTER TABLE users ADD COLUMN password_hash TEXT'); } catch { /* already exists */ }
   }
@@ -51,10 +52,26 @@ export class SqliteAuthStore implements AuthStore {
     }
     return { token: row.token, clientId: row.client_id, subject: row.subject, scope: row.scope, expires: row.expires };
   }
+
+  saveOidcState(record: OidcStateRecord): void {
+    this.db.prepare('DELETE FROM oidc_states WHERE expires < ?').run(Date.now());
+    this.db.prepare('INSERT INTO oidc_states (state_hash, code_verifier, nonce, purpose, oauth, expires) VALUES (?, ?, ?, ?, ?, ?)')
+      .run(record.stateHash, record.codeVerifier, record.nonce, record.purpose, record.oauth, record.expires);
+  }
+
+  consumeOidcState(stateHash: string): OidcStateRecord | undefined {
+    const row = this.db.prepare('DELETE FROM oidc_states WHERE state_hash = ? RETURNING state_hash, code_verifier, nonce, purpose, oauth, expires')
+      .get(stateHash) as {state_hash:string;code_verifier:string;nonce:string;purpose:string;oauth:string;expires:number}|undefined;
+    if (!row || row.expires < Date.now() || row.purpose !== 'oauth') return undefined;
+    return { stateHash: row.state_hash, codeVerifier: row.code_verifier, nonce: row.nonce, purpose: 'oauth', oauth: row.oauth, expires: row.expires };
+  }
 }
 
 export class SqliteUserStore implements UserStore {
-  constructor(private readonly db: DatabaseSync) {}
+  constructor(private readonly db: DatabaseSync) {
+    // Links from an OIDC identity (issuer + subject) to a local user
+    this.db.exec('CREATE TABLE IF NOT EXISTS oidc_identities (issuer TEXT NOT NULL, subject TEXT NOT NULL, user_id TEXT NOT NULL, created_at INTEGER NOT NULL, last_login_at INTEGER, PRIMARY KEY (issuer, subject));');
+  }
 
   createUser(user: McpUser): void {
     this.db.prepare('INSERT INTO users (id, name, email, password_hash, created_at) VALUES (?, ?, ?, ?, ?)')
@@ -83,7 +100,27 @@ export class SqliteUserStore implements UserStore {
   }
 
   deleteUser(id: string): boolean {
+    this.db.prepare('DELETE FROM oidc_identities WHERE user_id = ?').run(id);
     return this.db.prepare('DELETE FROM users WHERE id = ?').run(id).changes > 0;
+  }
+
+  getUserIdByOidcIdentity(issuer: string, subject: string): string | undefined {
+    const row = this.db.prepare('SELECT user_id FROM oidc_identities WHERE issuer = ? AND subject = ?').get(issuer, subject) as {user_id:string}|undefined;
+    return row?.user_id;
+  }
+
+  linkOidcIdentity(issuer: string, subject: string, userId: string): void {
+    const now = Date.now();
+    this.db.prepare('INSERT INTO oidc_identities (issuer, subject, user_id, created_at, last_login_at) VALUES (?, ?, ?, ?, ?)')
+      .run(issuer, subject, userId, now, now);
+  }
+
+  unlinkOidcIdentity(issuer: string, subject: string): void {
+    this.db.prepare('DELETE FROM oidc_identities WHERE issuer = ? AND subject = ?').run(issuer, subject);
+  }
+
+  touchOidcIdentity(issuer: string, subject: string): void {
+    this.db.prepare('UPDATE oidc_identities SET last_login_at = ? WHERE issuer = ? AND subject = ?').run(Date.now(), issuer, subject);
   }
 
   private map(row: {id:string;name:string;email:string|null;password_hash:string|null;created_at:number}|undefined): McpUser|undefined {
