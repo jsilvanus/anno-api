@@ -8,6 +8,7 @@ import { randomToken, verifyS256 } from './pkce.js';
 import { issueAccessToken } from './jwt.js';
 import { contentSecurityPolicy, redirectSource } from '../csp.js';
 import { RateLimiter } from './rate-limit.js';
+import { OidcRelyingParty, type OidcClaims, type OidcConfig } from './oidc.js';
 
 export interface RegistrationOptions {
   /** Allow new users to create an account on the sign-in page (default true). */
@@ -22,6 +23,8 @@ export interface AuthorizationServerOptions {
   registration?: Partial<RegistrationOptions>;
   /** Resolves a CIMD client_id to its metadata. Replaceable in tests. */
   fetchClientMetadata?: (clientId: string) => Promise<CimdMetadata>;
+  /** OpenID Connect sign-in with an external identity provider. Unset = off (no button, no /oidc routes). */
+  oidc?: OidcConfig;
 }
 
 const LOGIN_TICKET_TTL = '10m';
@@ -33,7 +36,7 @@ function escapeHtml(value: string): string {
 function page(title: string, body: string): string {
   return '<!doctype html><html lang="fi"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>' +
     escapeHtml(title) +
-    '</title><style>body{font-family:system-ui,sans-serif;background:#f6f7f9;margin:0;padding:4rem 1rem;color:#1d1d1f}main{max-width:420px;margin:0 auto;background:#fff;padding:2rem;border-radius:12px;box-shadow:0 8px 30px rgba(0,0,0,.08)}h1{margin-top:0;font-size:1.5rem}h2{font-size:1.1rem;margin:0}label{display:block;margin:.9rem 0 .35rem}input{display:block;width:100%;box-sizing:border-box;padding:.7rem;border:1px solid #ccc;border-radius:7px;font:inherit}button{margin-top:1rem;padding:.7rem 1.1rem;border:0;border-radius:7px;cursor:pointer;background:#5b2a86;color:#fff;font:inherit}.secondary{margin-left:.5rem;background:#eee;color:#1d1d1f}.error{color:#b00020}.hint{color:#555;font-size:.9rem}details{margin-top:2rem;border-top:1px solid #e5e5e5;padding-top:1.2rem}summary{cursor:pointer;font-weight:600}</style></head><body><main>' +
+    '</title><style>body{font-family:system-ui,sans-serif;background:#f6f7f9;margin:0;padding:4rem 1rem;color:#1d1d1f}main{max-width:420px;margin:0 auto;background:#fff;padding:2rem;border-radius:12px;box-shadow:0 8px 30px rgba(0,0,0,.08)}h1{margin-top:0;font-size:1.5rem}h2{font-size:1.1rem;margin:0}label{display:block;margin:.9rem 0 .35rem}input{display:block;width:100%;box-sizing:border-box;padding:.7rem;border:1px solid #ccc;border-radius:7px;font:inherit}button{margin-top:1rem;padding:.7rem 1.1rem;border:0;border-radius:7px;cursor:pointer;background:#5b2a86;color:#fff;font:inherit}.secondary{margin-left:.5rem;background:#eee;color:#1d1d1f}.error{color:#b00020}.hint{color:#555;font-size:.9rem}a.button{display:inline-block;padding:.7rem 1.1rem;border-radius:7px;background:#5b2a86;color:#fff;text-decoration:none}.or{color:#555;font-size:.9rem;margin-top:1.5rem}details{margin-top:2rem;border-top:1px solid #e5e5e5;padding-top:1.2rem}summary{cursor:pointer;font-weight:600}</style></head><body><main>' +
     body +
     '</main></body></html>';
 }
@@ -42,6 +45,8 @@ interface LoginPageState {
   loginError?: string;
   registerError?: string;
   registration: RegistrationOptions;
+  /** Label of the single sign-on button; the button is shown only when OIDC is configured. */
+  sso?: string;
   values?: { email?: string; name?: string };
 }
 
@@ -65,6 +70,7 @@ function loginPage(oauth: string, state: LoginPageState): string {
   return page('Kirjaudu – Kirkkovuosi MCP',
     '<h1>Kirjaudu sisään</h1><p>Kirjaudu sisään, jotta MCP-sovellus voi käyttää Kirkkovuosi-palvelua.</p>' +
     (state.loginError ? '<p class="error">' + escapeHtml(state.loginError) + '</p>' : '') +
+    (state.sso ? '<p><a class="button" href="/oidc/login?oauth=' + encodeURIComponent(oauth) + '">' + escapeHtml(state.sso) + '</a></p><p class="or">tai sähköpostilla ja salasanalla</p>' : '') +
     '<form method="post" action="/oauth/authorize">' +
     '<input type="hidden" name="oauth" value="' + escapeHtml(oauth) + '">' +
     '<label for="email">Sähköposti</label><input id="email" name="email" type="email" autocomplete="username" required autofocus value="' + escapeHtml(state.registerError ? '' : v.email ?? '') + '">' +
@@ -84,8 +90,8 @@ function consentPage(oauth: string, ticket: string, userName: string, clientName
     '<button class="secondary" type="submit" name="action" value="deny">Estä</button></form>');
 }
 
-function errorPage(title: string): string {
-  return page(title, '<h1>' + escapeHtml(title) + '</h1>');
+function errorPage(title: string, message?: string): string {
+  return page(title, '<h1>' + escapeHtml(title) + '</h1>' + (message ? '<p>' + escapeHtml(message) + '</p>' : ''));
 }
 
 function encodeOAuth(query: Record<string,string|undefined>): string {
@@ -101,6 +107,17 @@ function sendHtml(reply: FastifyReply, html: string, formAction: string[] = [], 
 }
 
 const oauthHash = (oauth: string) => createHash('sha256').update(oauth).digest('base64url');
+
+const OIDC_COOKIE = 'anno_oidc';
+const OIDC_STATE_TTL_MS = 10 * 60_000;
+
+function readCookie(header: string | undefined, name: string): string | undefined {
+  for (const part of (header ?? '').split(';')) {
+    const index = part.indexOf('=');
+    if (index > 0 && part.slice(0, index).trim() === name) return part.slice(index + 1).trim();
+  }
+  return undefined;
+}
 
 const EMAIL_RE = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 
@@ -122,6 +139,9 @@ export async function mountAuthorizationServer(
   const loginLimiter = new RateLimiter({ limit: 10, windowMs: 15 * 60_000 });
   const registerLimiter = new RateLimiter({ limit: 5, windowMs: 60 * 60_000 });
   const ticketAudience = issuer + '/oauth/authorize';
+  const oidc = options.oidc;
+  const loginState = (extra: Omit<LoginPageState, 'registration' | 'sso'>): LoginPageState =>
+    ({ registration, ...(oidc ? { sso: oidc.buttonLabel } : {}), ...extra });
 
   async function validateRequest(query: Record<string,string|undefined>) {
     if (query.response_type !== 'code' || !query.client_id || !query.redirect_uri || !query.code_challenge || query.code_challenge_method !== 'S256') {
@@ -174,7 +194,7 @@ export async function mountAuthorizationServer(
     const q = request.query as Record<string,string|undefined>;
     try {
       await validateRequest(q);
-      return sendHtml(reply, loginPage(encodeOAuth(q), { registration }));
+      return sendHtml(reply, loginPage(encodeOAuth(q), loginState({})));
     } catch {
       return sendHtml(reply, errorPage('Virheellinen valtuutuspyyntö'), [], 400);
     }
@@ -195,7 +215,7 @@ export async function mountAuthorizationServer(
     if (body.action !== undefined) {
       const user = body.ticket ? await verifyLoginTicket(body.ticket, oauth) : undefined;
       if (!user) {
-        return sendHtml(reply, loginPage(oauth, { registration, loginError: 'Kirjautuminen on vanhentunut. Kirjaudu uudelleen.' }), [], 401);
+        return sendHtml(reply, loginPage(oauth, loginState({ loginError: 'Kirjautuminen on vanhentunut. Kirjaudu uudelleen.' })), [], 401);
       }
 
       if (body.action !== 'approve') {
@@ -226,15 +246,15 @@ export async function mountAuthorizationServer(
 
     // Step 1: sign in
     if (!body.email || !body.password) {
-      return sendHtml(reply, loginPage(oauth, { registration, loginError: 'Anna sähköposti ja salasana.' }), [], 400);
+      return sendHtml(reply, loginPage(oauth, loginState({ loginError: 'Anna sähköposti ja salasana.' })), [], 400);
     }
     if (!loginLimiter.allow(clientIp(request))) {
-      return sendHtml(reply, loginPage(oauth, { registration, loginError: 'Liian monta kirjautumisyritystä. Yritä myöhemmin uudelleen.', values: { email: body.email } }), [], 429);
+      return sendHtml(reply, loginPage(oauth, loginState({ loginError: 'Liian monta kirjautumisyritystä. Yritä myöhemmin uudelleen.', values: { email: body.email } })), [], 429);
     }
     const user = users.getUserByEmail(body.email.trim());
     if (!user?.passwordHash || !(await verify(user.passwordHash, body.password))) {
       loginLimiter.hit(clientIp(request));
-      return sendHtml(reply, loginPage(oauth, { registration, loginError: 'Väärä sähköposti tai salasana.', values: { email: body.email } }), [], 401);
+      return sendHtml(reply, loginPage(oauth, loginState({ loginError: 'Väärä sähköposti tai salasana.', values: { email: body.email } })), [], 401);
     }
     return showConsent(reply, oauth, q, metadata, user);
   });
@@ -250,14 +270,14 @@ export async function mountAuthorizationServer(
     }
     const oauth = body.oauth!;
     if (!registration.enabled) {
-      return sendHtml(reply, loginPage(oauth, { registration }), [], 403);
+      return sendHtml(reply, loginPage(oauth, loginState({})), [], 403);
     }
 
     const email = (body.email ?? '').trim().toLowerCase();
     const name = (body.name ?? '').trim().slice(0, 100);
     const values = { email, name };
     const fail = (message: string, status = 400) =>
-      sendHtml(reply, loginPage(oauth, { registration, registerError: message, values }), [], status);
+      sendHtml(reply, loginPage(oauth, loginState({ registerError: message, values })), [], status);
 
     if (!registerLimiter.allow(clientIp(request))) return fail('Liian monta rekisteröitymistä. Yritä myöhemmin uudelleen.', 429);
     if (!EMAIL_RE.test(email) || email.length > 254) return fail('Anna kelvollinen sähköpostiosoite.');
@@ -291,6 +311,139 @@ export async function mountAuthorizationServer(
     request.log.info({ userId: user.id }, 'user registered');
     return showConsent(reply, oauth, q, metadata, user);
   });
+
+  if (oidc) mountOidcSignIn();
+
+  /**
+   * Single sign-on with the external OIDC provider. The provider only authenticates the user;
+   * the result continues to the same consent step as a password sign-in.
+   */
+  function mountOidcSignIn() {
+    const cfg = oidc!;
+    const rp = new OidcRelyingParty(cfg, issuer + '/oidc/callback');
+    const oidcLimiter = new RateLimiter({ limit: 30, windowMs: 15 * 60_000 });
+    const secureCookie = cfg.production || issuer.startsWith('https:');
+    const cookie = (value: string, maxAge: number) =>
+      `${OIDC_COOKIE}=${value}; Path=/oidc; Max-Age=${maxAge}; HttpOnly; SameSite=Lax${secureCookie ? '; Secure' : ''}`;
+    const stateHash = (state: string) => createHash('sha256').update(state).digest('base64url');
+    const failure = (reply: FastifyReply, message: string, status = 400) =>
+      sendHtml(reply, errorPage('Kertakirjautuminen epäonnistui', message + ' Palaa MCP-sovellukseen ja yritä uudelleen.'), [], status);
+
+    app.get('/oidc/login', async (request, reply) => {
+      const oauth = (request.query as Record<string, string | undefined>).oauth;
+      // This server has no web UI of its own: a sign-in always continues an MCP authorization request.
+      if (!oauth) return sendHtml(reply, errorPage('Virheellinen valtuutuspyyntö'), [], 400);
+      if (!oidcLimiter.allow(clientIp(request))) return failure(reply, 'Liian monta kirjautumisyritystä. Yritä myöhemmin uudelleen.', 429);
+      oidcLimiter.hit(clientIp(request));
+      try {
+        await validateRequest(decodeOAuth(oauth));
+      } catch {
+        return sendHtml(reply, errorPage('Virheellinen valtuutuspyyntö'), [], 400);
+      }
+      let start;
+      try {
+        start = await rp.start();
+      } catch (err) {
+        request.log.error({ err: (err as Error).message }, 'oidc discovery failed');
+        return failure(reply, 'Kirjautumispalveluun ei saatu yhteyttä.', 502);
+      }
+      authStore.saveOidcState({
+        stateHash: stateHash(start.state),
+        codeVerifier: start.codeVerifier,
+        nonce: start.nonce,
+        purpose: 'oauth',
+        oauth,
+        expires: Date.now() + OIDC_STATE_TTL_MS,
+      });
+      return reply.header('Set-Cookie', cookie(start.state, OIDC_STATE_TTL_MS / 1000)).header('Cache-Control', 'no-store').redirect(start.url.toString());
+    });
+
+    app.get('/oidc/callback', async (request, reply) => {
+      const query = request.query as Record<string, string | undefined>;
+      const cookieState = readCookie(request.headers.cookie, OIDC_COOKIE);
+      reply.header('Set-Cookie', cookie('', 0));
+
+      if (query.error) {
+        request.log.warn({ error: String(query.error).slice(0, 100) }, 'oidc provider returned an error');
+        if (query.state && cookieState === query.state) authStore.consumeOidcState(stateHash(query.state));
+        return failure(reply, 'Kirjautumispalvelu ei hyväksynyt kirjautumista.');
+      }
+      // Login CSRF: the state must come back to the browser that started the sign-in
+      if (!query.state || !cookieState || cookieState !== query.state) {
+        request.log.warn('oidc callback state does not match the cookie');
+        return failure(reply, 'Kirjautumisen tila ei täsmää.');
+      }
+      const pending = authStore.consumeOidcState(stateHash(query.state));
+      if (!pending) {
+        request.log.warn('oidc callback with an unknown, used or expired state');
+        return failure(reply, 'Kirjautuminen on vanhentunut tai jo käytetty.');
+      }
+
+      let claims: OidcClaims;
+      try {
+        const rawQuery = request.raw.url?.split('?')[1] ?? '';
+        claims = await rp.finish(rawQuery, { state: query.state, nonce: pending.nonce, codeVerifier: pending.codeVerifier });
+      } catch (err) {
+        request.log.warn({ err: (err as Error).message }, 'oidc code exchange failed');
+        return failure(reply, 'Kirjautumista ei voitu vahvistaa.');
+      }
+
+      const user = findOrCreateOidcUser(claims, request);
+      if (!user) {
+        request.log.info('oidc sign-in without a local account');
+        return failure(reply, 'Tällä kirjautumisella ei ole tunnusta. Pyydä ylläpitäjää luomaan tunnus.', 403);
+      }
+      request.log.info({ userId: user.id }, 'oidc sign-in');
+
+      let q: Record<string, string | undefined>;
+      let metadata: CimdMetadata;
+      try {
+        ({ q, metadata } = await parseOAuth({ oauth: pending.oauth }));
+      } catch {
+        return sendHtml(reply, errorPage('Virheellinen valtuutuspyyntö'), [], 400);
+      }
+      return showConsent(reply, pending.oauth, q, metadata, user);
+    });
+
+    /** Identity → local user: linked identity, then verified e-mail, then (optionally) a new account. */
+    function findOrCreateOidcUser(claims: OidcClaims, request: FastifyRequest): McpUser | undefined {
+      const linkedId = users.getUserIdByOidcIdentity(cfg.issuer, claims.sub);
+      if (linkedId) {
+        const linked = users.getUser(linkedId);
+        if (linked) {
+          users.touchOidcIdentity(cfg.issuer, claims.sub);
+          return linked;
+        }
+        users.unlinkOidcIdentity(cfg.issuer, claims.sub); // the user was deleted
+      }
+
+      const trustedEmail = claims.email && (claims.emailVerified || cfg.trustEmail) ? claims.email.toLowerCase() : undefined;
+      if (trustedEmail) {
+        const existing = users.getUserByEmail(trustedEmail);
+        if (existing) {
+          users.linkOidcIdentity(cfg.issuer, claims.sub, existing.id);
+          request.log.info({ userId: existing.id }, 'oidc identity linked by e-mail');
+          return existing;
+        }
+      }
+
+      if (!cfg.createUsers) return undefined;
+      const user: McpUser = {
+        id: randomUUID(),
+        name: (claims.name ?? claims.preferredUsername ?? claims.email ?? claims.sub).slice(0, 100),
+        ...(trustedEmail ? { email: trustedEmail } : {}),
+        createdAt: Date.now(),
+      };
+      try {
+        users.createUser(user);
+      } catch {
+        return undefined; // a concurrent sign-in created the e-mail first
+      }
+      users.linkOidcIdentity(cfg.issuer, claims.sub, user.id);
+      request.log.info({ userId: user.id }, 'user created from oidc sign-in');
+      return user;
+    }
+  }
 
   app.post('/oauth/token', async (request, reply) => {
     const b = request.body as Record<string,string|undefined>;

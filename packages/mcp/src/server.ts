@@ -1,6 +1,7 @@
 import { hash } from '@node-rs/argon2';
 import { buildApp } from './app.js';
 import { SqliteAuthStore, SqliteUserStore } from './storage/sqlite.js';
+import { parseOidcConfig } from './oauth/oidc.js';
 
 const port = Number(process.env.PORT ?? '5999');
 const publicUrl = process.env.MCP_PUBLIC_URL ?? ('http://localhost:' + port);
@@ -11,6 +12,9 @@ if (!secretText) throw new Error('JWT_SECRET is required');
 
 const secret = Buffer.from(secretText, 'base64');
 if (secret.length < 32) throw new Error('JWT_SECRET must decode to at least 32 bytes');
+
+// Optional OIDC sign-in (off when OIDC_ISSUER is unset); invalid settings stop the server here
+const oidc = parseOidcConfig(process.env);
 
 const storagePath = process.env.STORAGE_PATH ?? './data/app.sqlite';
 const store = new SqliteAuthStore(storagePath);
@@ -38,6 +42,7 @@ const app = await buildApp({
       allowedEmailDomains: list(process.env.MCP_REGISTRATION_EMAIL_DOMAINS),
       ...(process.env.MCP_MIN_PASSWORD_LENGTH ? { minPasswordLength: Number(process.env.MCP_MIN_PASSWORD_LENGTH) } : {}),
     },
+    ...(oidc ? { oidc } : {}),
   },
   ...(trustProxy ? { trustProxy: trustProxy === 'true' ? true : list(trustProxy) } : {}),
 });

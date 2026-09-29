@@ -12,7 +12,7 @@ Sources: Evankeliumikirja (2021), Jumalanpalvelusten kirja (2000) and the weekly
 |---|---|
 | [`packages/core`](packages/core) — `@anno-api/core` | Calendar computation, date resolution and the data. Zero dependencies. |
 | [`packages/api`](packages/api) — `@anno-api/api` | REST API, zero-dependency HTTP server. [Endpoints](docs/README.md) |
-| [`packages/mcp`](packages/mcp) — `@anno-api/mcp` | MCP server (Streamable HTTP) with an embedded OAuth server; sign-in and registration on the OAuth page. [Tools](docs/mcp.md) |
+| [`packages/mcp`](packages/mcp) — `@anno-api/mcp` | MCP server (Streamable HTTP) with an embedded OAuth server; sign-in and registration on the OAuth page, optional single sign-on with an OIDC provider (`OIDC_ISSUER`). [Tools](docs/mcp.md) |
 
 An MCP server that answers live from kirkkovuosikalenteri.fi (Finnish and Swedish), and an instruction for an AI to use the site's public API directly, are in [jsilvanus/kirkkovuosi-mcp](https://github.com/jsilvanus/kirkkovuosi-mcp).
 
@@ -57,7 +57,7 @@ The response structure is documented in [docs/day-response.md](docs/day-response
 
 ## MCP server
 
-Connect an MCP client to `https://<your host>/mcp`. On first use the client opens the server's OAuth page, where the user signs in or creates an account. Tools: `church_day`, `daily_lectionary`, `holy_day`, `upcoming_holy_days`, `church_year_calendar`, `list_holy_days`, `church_year_periods`, `search_bible_reference`, `liturgical_texts`. See [docs/mcp.md](docs/mcp.md).
+Connect an MCP client to `https://<your host>/mcp`. On first use the client opens the server's OAuth page, where the user signs in, creates an account or uses single sign-on (when configured). Tools: `church_day`, `daily_lectionary`, `holy_day`, `upcoming_holy_days`, `church_year_calendar`, `list_holy_days`, `church_year_periods`, `search_bible_reference`, `liturgical_texts`. See [docs/mcp.md](docs/mcp.md).
 
 ## Project structure
 
