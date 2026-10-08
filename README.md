@@ -19,13 +19,14 @@ An MCP server that answers live from kirkkovuosikalenteri.fi (Finnish and Swedis
 ## Quick start
 
 ```bash
+cp .env.example .env   # optional, for API/MCP runtime settings
 npm install
 npm start            # REST API on port 3000 (or $PORT)
 npm run dev          # REST API with --watch
 npm test             # all packages
 
 npm run build        # compile the MCP server
-npm run start:mcp    # MCP server (configure packages/mcp/.env first)
+npm run start:mcp    # MCP server reads .env from the repo root
 ```
 
 Node.js 22.5 or newer.
