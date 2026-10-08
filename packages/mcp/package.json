@@ -10,9 +10,9 @@
   "scripts": {
     "build": "tsc -p tsconfig.json",
     "typecheck": "tsc -p tsconfig.json --noEmit",
-    "dev": "tsx watch src/server.ts",
-    "start": "node dist/server.js",
-    "user": "tsx scripts/mcp-user.ts",
+    "dev": "node --env-file=../../.env --import tsx watch src/server.ts",
+    "start": "node --env-file=../../.env dist/server.js",
+    "user": "node --env-file=../../.env --import tsx scripts/mcp-user.ts",
     "test": "node --import tsx --test test/*.test.ts"
   },
   "dependencies": {

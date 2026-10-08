@@ -66,7 +66,7 @@ Accounts can also be managed from the command line: `npm run user -w @anno-api/m
 ## Running
 
 ```bash
-cp packages/mcp/.env.example packages/mcp/.env   # set MCP_PUBLIC_URL and JWT_SECRET
+cp .env.example .env   # set MCP_PUBLIC_URL and JWT_SECRET
 npm install
 npm run build
 npm run start:mcp

@@ -12,7 +12,7 @@ npm start            # REST API (port 3000, or $PORT)
 npm run dev          # REST API with --watch
 npm test             # all packages
 npm run build        # compile packages/mcp (TypeScript)
-npm run start:mcp    # MCP server (needs packages/mcp/.env: MCP_PUBLIC_URL, JWT_SECRET)
+npm run start:mcp    # MCP server (reads repo-root .env: MCP_PUBLIC_URL, JWT_SECRET)
 npm test -w @anno-api/core   # one package
 ```
 
